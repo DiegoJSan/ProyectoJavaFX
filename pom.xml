@@ -31,7 +31,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.4</version>
                 <configuration>
-                    <mainClass>diegosanchez.alien.App</mainClass>
+                    <mainClass>diegosanchez.alien.Alien</mainClass>
                 </configuration>
                 <executions>
                     <execution>
