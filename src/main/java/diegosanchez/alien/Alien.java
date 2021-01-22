@@ -9,9 +9,13 @@ Diego Jesús Sánchez Del Corral
 package diegosanchez.alien;
 
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
@@ -22,14 +26,16 @@ import javafx.stage.Stage;
 
 public class Alien extends Application {
     
-   
+    int altoPantalla = 700;
+    int anchoPantalla = 900;
 
     @Override
     public void start(Stage primeraEtapa) {
         //Crear el contenedor para poner los objetos
         Pane root = new Pane();
         //Crear la escena(ventana)
-        Scene escena = new Scene(root, 900, 700, Color.BLACK);
+        Scene escena = new Scene(root, anchoPantalla, altoPantalla, Color.BLACK);
+        primeraEtapa.setResizable(false);
         primeraEtapa.setTitle("Alien");
         primeraEtapa.setScene(escena);
         primeraEtapa.show();
@@ -52,12 +58,12 @@ public class Alien extends Application {
         });
         alaIzqNave.setFill(Color.WHITE);
         //Ala derecha nave
-        Polygon alaDrchNave = new Polygon(new double[]{
+        Polygon alaDchaNave = new Polygon(new double[]{
             120.0, 70.0,
             120.0, 150.0,
             180.0, 180.0 
         });
-        alaDrchNave.setFill(Color.WHITE);
+        alaDchaNave.setFill(Color.WHITE);
         //Fuego nave 1
         Polygon fuegoNave1 = new Polygon(new double[]{
             100.0, 180.0,
@@ -80,21 +86,74 @@ public class Alien extends Application {
         ventanaNave.setRadiusY(18);
         }
         ventanaNave.setFill(Color.CORNFLOWERBLUE);
+        //Linea nave1
+        Line lineaNave1 = new Line (97, 75, 97, 145);
+        lineaNave1.setStroke(Color.WHITE);
+        lineaNave1.setStrokeWidth(2);
+        lineaNave1.setFill(Color.WHITE);
         //Linea nave
-        Line lineaNave = new Line (70, 102, 70, 102);
-        lineaNave.setStroke(Color.WHITE);
-        lineaNave.setStrokeWidth(4);
-        //lineaNave.setFill(Color.WHITE);
+        Line lineaNave2 = new Line (103, 75, 103, 145);
+        lineaNave2.setStroke(Color.WHITE);
+        lineaNave2.setStrokeWidth(2);
+        lineaNave2.setFill(Color.WHITE);
+        //Punta ala izaquierda
+        Polygon puntaAlaIzq = new Polygon(new double[]{
+            25, 140,
+            20, 180,
+            30, 175
+        });
+        puntaAlaIzq.setFill(Color.CRIMSON);
+        //Punta ala derecha
+        Polygon puntaAlaDcha = new Polygon(new double[]{
+            175, 140,
+            170, 175,
+            180, 180
+        });
+        puntaAlaDcha.setFill(Color.CRIMSON);
+        //Circulo ala iqz
+        Circle circuloAlaIqz = new Circle();
+        circuloAlaIqz.setCenterX(62);
+        circuloAlaIqz.setCenterY(137);
+        circuloAlaIqz.setRadius(6);
+        circuloAlaIqz.setFill(Color.CRIMSON);
+        //Circulo ala derecha
+        Circle circuloAlaDcha = new Circle();
+        circuloAlaDcha.setCenterX(138);
+        circuloAlaDcha.setCenterY(137);
+        circuloAlaDcha.setRadius(6);
+        circuloAlaDcha.setFill(Color.CRIMSON);
         
-        //Agregar partes de la nave al contenedor
-        root.getChildren().add(picoNave);
-        root.getChildren().add(cuerpoNave);
-        root.getChildren().add(alaIzqNave);
-        root.getChildren().add(alaDrchNave);
-        root.getChildren().add(fuegoNave1);
-        root.getChildren().add(fuegoNave2);
-        root.getChildren().add(ventanaNave);
-        root.getChildren().add(lineaNave);
+        //Agrupar todos los objetos de la nave
+        Group nave = new Group();
+        nave.getChildren().add(picoNave);
+        nave.getChildren().add(cuerpoNave);
+        nave.getChildren().add(alaIzqNave);
+        nave.getChildren().add(alaDchaNave);
+        nave.getChildren().add(fuegoNave1);
+        nave.getChildren().add(fuegoNave2);
+        nave.getChildren().add(ventanaNave);
+        nave.getChildren().add(lineaNave1);
+        nave.getChildren().add(lineaNave2);
+        nave.getChildren().add(puntaAlaIzq);
+        nave.getChildren().add(puntaAlaDcha);
+        nave.getChildren().add(circuloAlaIqz);
+        nave.getChildren().add(circuloAlaDcha);
+        
+        //Posicionar la nave
+        nave.setLayoutX(350);
+        nave.setLayoutY(500);
+        //Escalar la nave
+        nave.setScaleX(0.4);
+        nave.setScaleY(0.4);
+        
+        //Fondo de pantalla
+        var fondoPantalla = new Image(getClass().getResourceAsStream("/images/FondoEstrellas.png"));
+        ImageView fondoPantallaView = new ImageView(fondoPantalla);
+                
+        //Añadir el grupo al contenedor
+        root.getChildren().add(fondoPantallaView);
+        root.getChildren().add(nave);
+        
     }
 
     public static void main(String[] args) {
