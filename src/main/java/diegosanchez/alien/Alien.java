@@ -8,11 +8,14 @@ Diego Jesús Sánchez Del Corral
 
 package diegosanchez.alien;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -21,20 +24,33 @@ import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 
 
 public class Alien extends Application {
     
-    int altoPantalla = 700;
-    int anchoPantalla = 900;
+    //Variables
+    final int ALTO_PANTALLA = 700;
+    final int ANCHO_PANTALLA = 900;
+    int posicionXFondo1 = 0;
+    int posicionYFondo1 = 0;
+    int posicionXFondo2 = 0;
+    int posicionYFondo2 = -700;
+    int velocidadFondo = 1;
+    int posicionNaveX = 175;
+    int posicionNaveY = 265;  
+    //Variable para velocidad de movimiento de la nave
+    int velocidadNaveX = 0;
+    int velocidadNaveY = 0;
+    
 
     @Override
     public void start(Stage primeraEtapa) {
         //Crear el contenedor para poner los objetos
         Pane root = new Pane();
         //Crear la escena(ventana)
-        Scene escena = new Scene(root, anchoPantalla, altoPantalla, Color.BLACK);
+        Scene escena = new Scene(root, ANCHO_PANTALLA, ALTO_PANTALLA, Color.BLACK);
         primeraEtapa.setResizable(false);
         primeraEtapa.setTitle("Alien");
         primeraEtapa.setScene(escena);
@@ -140,22 +156,112 @@ public class Alien extends Application {
         nave.getChildren().add(circuloAlaDcha);
         
         //Posicionar la nave
-        nave.setLayoutX(350);
-        nave.setLayoutY(500);
+        nave.setLayoutX(posicionNaveX);
+        nave.setLayoutY(posicionNaveY);
         //Escalar la nave
         nave.setScaleX(0.4);
         nave.setScaleY(0.4);
         
-        //Fondo de pantalla
-        var fondoPantalla = new Image(getClass().getResourceAsStream("/images/FondoEstrellas.png"));
-        ImageView fondoPantallaView = new ImageView(fondoPantalla);
+        //Imegen 1 de pantalla
+        var fondoPantalla1 = new Image(getClass().getResourceAsStream("/images/FondoEstrellas1.png"));
+        ImageView fondoPantallaView1 = new ImageView(fondoPantalla1);
+        
+        //Imegen 2 de pantalla
+        var fondoPantalla2 = new Image(getClass().getResourceAsStream("/images/FondoEstrellas2.png"));
+        ImageView fondoPantallaView2 = new ImageView(fondoPantalla2);
+        
+        //Posicionar imagen 1
+        fondoPantallaView1.setLayoutX(posicionXFondo1);
+        fondoPantallaView1.setLayoutY(posicionYFondo1);
+        
+        //Posicionar imagen 2
+        fondoPantallaView2.setLayoutX(posicionXFondo2);
+        fondoPantallaView2.setLayoutY(posicionYFondo2);
                 
-        //Añadir el grupo al contenedor
-        root.getChildren().add(fondoPantallaView);
+        //Añadir al contenedor
+        root.getChildren().add(fondoPantallaView1);
+        root.getChildren().add(fondoPantallaView2);
         root.getChildren().add(nave);
         
+        //Movimiento del fondo
+        Timeline movimiento = new Timeline(
+            //Movimiento del fondo comprobando que ha llegado al final de la pantalla
+            new KeyFrame(Duration.seconds(0.017),(var ae) -> {
+                fondoPantallaView1.setLayoutY(posicionYFondo1);
+                posicionYFondo1+= velocidadFondo;
+                fondoPantallaView2.setLayoutY(posicionYFondo2);
+                posicionYFondo2+= velocidadFondo;
+                if (posicionYFondo1 >= ALTO_PANTALLA) {
+                    posicionYFondo1 = -700;
+                }
+                if (posicionYFondo2 >= ALTO_PANTALLA) {
+                    posicionYFondo2 = -700;
+                }
+                //Actualizar posición X de la nave
+                posicionNaveX += velocidadNaveX;
+                nave.setTranslateX(posicionNaveX);
+                //Actualizar posición Y de la nave
+                posicionNaveY += velocidadNaveY;
+                nave.setTranslateY(posicionNaveY);
+                
+                //Comprobar si se sale la nave por la izquierda
+                if (posicionNaveX < -230) {
+                    posicionNaveX = -230;
+                }else{
+                    //Cpmprobar que no se sale por la derecha
+                    if (posicionNaveX > 580) {
+                        posicionNaveX = 580;
+                    }
+                }
+            })
+        );
+        movimiento.setCycleCount (Timeline.INDEFINITE);
+        movimiento.play();
+        
+        //Detección de las pulsaciones de las teclas
+        escena.setOnKeyPressed((KeyEvent event) -> {
+            switch(event.getCode()) {
+                case LEFT:
+                    //Pulsada tecla izquierda
+                    velocidadNaveX = -5;
+                    break;
+                case RIGHT:
+                    //Pulsada tecla derecha
+                    velocidadNaveX = 5;
+                    break;
+                case UP:
+                    //Pulsada tecla arriba
+                    velocidadNaveY = -5;
+                    break;
+                case DOWN:
+                    //Pulsada tecla abajo
+                    velocidadNaveY = 5;
+                    break;
+            }
+        });
+        //Detección de dejar de pulsar las teclas
+        escena.setOnKeyReleased((KeyEvent event) -> {
+            switch(event.getCode()) {
+                case LEFT:
+                    //Dejar de pulsar tecla izquierda
+                    velocidadNaveX = 0;
+                    break;
+                case RIGHT:
+                    //Dejar de pulsar tecla derecha
+                    velocidadNaveX = 0;
+                    break;
+                case UP:
+                    //Dejar de pulsar tecla arriba
+                    velocidadNaveY = 0;
+                    break;
+                case DOWN:
+                    //Dejar de pulsar tecla abajo
+                    velocidadNaveY = 0;
+                    break;
+            }
+        });
+        
     }
-
     public static void main(String[] args) {
         launch();
     }
