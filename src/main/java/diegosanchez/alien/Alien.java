@@ -8,6 +8,7 @@ Diego Jesús Sánchez Del Corral
 
 package diegosanchez.alien;
 
+import java.util.Random;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
@@ -33,16 +34,18 @@ public class Alien extends Application {
     //Variables
     final int ALTO_PANTALLA = 700;
     final int ANCHO_PANTALLA = 900;
-    int posicionXFondo1 = 0;
-    int posicionYFondo1 = 0;
-    int posicionXFondo2 = 0;
-    int posicionYFondo2 = -700;
-    int velocidadFondo = 1;
-    int posicionNaveX = 175;
-    int posicionNaveY = 265;  
+    float posicionXFondo1 = 0;
+    float posicionYFondo1 = 0;
+    float posicionXFondo2 = 0;
+    float posicionYFondo2 = -700;
+    float velocidadFondo = 0.5f;
+    int posicionNaveX = 450;
+    int posicionNaveY = 550;  
     //Variable para velocidad de movimiento de la nave
     int velocidadNaveX = 0;
     int velocidadNaveY = 0;
+    
+    int posicionYNaveTitan = 0;
     
 
     @Override
@@ -58,83 +61,83 @@ public class Alien extends Application {
         //Crear nave espacial
         //Pico nave
         Polygon picoNave = new Polygon(new double[]{
-            100.0, 0.0,
-            80.0, 50.0,
-            120.0, 50.0 
+            0.0, 0.0,
+            -20.0, 50.0,
+            20.0, 50.0 
         });
         picoNave.setFill(Color.WHITE);
         //Cuerpo nave
-        Rectangle cuerpoNave = new Rectangle (80,50,40,100);
+        Rectangle cuerpoNave = new Rectangle (-20,50,40,100);
         cuerpoNave.setFill(Color.CRIMSON);
         //Ala izquierda nave
         Polygon alaIzqNave = new Polygon(new double[]{
-            80.0, 70.0,
-            20.0, 180.0,
-            80.0, 150.0 
+            -20.0, 70.0,
+            -80.0, 180.0,
+            -20.0, 150.0 
         });
         alaIzqNave.setFill(Color.WHITE);
         //Ala derecha nave
         Polygon alaDchaNave = new Polygon(new double[]{
-            120.0, 70.0,
-            120.0, 150.0,
-            180.0, 180.0 
+            20.0, 70.0,
+            20.0, 150.0,
+            80.0, 180.0 
         });
         alaDchaNave.setFill(Color.WHITE);
         //Fuego nave 1
         Polygon fuegoNave1 = new Polygon(new double[]{
-            100.0, 180.0,
-            90.0, 150.0,
-            110.0, 150.0 
+            0.0, 180.0,
+            -10.0, 150.0,
+            10.0, 150.0 
         });
         fuegoNave1.setFill(Color.YELLOW);
         //Fuego nave 2
         Polygon fuegoNave2 = new Polygon(new double[]{
-            100.0, 170.0,
-            95.0, 150.0,
-            105.0, 150.0 
+            0.0, 170.0,
+            -5.0, 150.0,
+            5.0, 150.0 
         });
         fuegoNave2.setFill(Color.RED);
         //Ventana nave
         Ellipse ventanaNave = new Ellipse(); {
-        ventanaNave.setCenterX(100);
+        ventanaNave.setCenterX(0);
         ventanaNave.setCenterY(50);
         ventanaNave.setRadiusX(8);
         ventanaNave.setRadiusY(18);
         }
         ventanaNave.setFill(Color.CORNFLOWERBLUE);
         //Linea nave1
-        Line lineaNave1 = new Line (97, 75, 97, 145);
+        Line lineaNave1 = new Line (-3, 75, -3, 145);
         lineaNave1.setStroke(Color.WHITE);
         lineaNave1.setStrokeWidth(2);
         lineaNave1.setFill(Color.WHITE);
         //Linea nave
-        Line lineaNave2 = new Line (103, 75, 103, 145);
+        Line lineaNave2 = new Line (3, 75, 3, 145);
         lineaNave2.setStroke(Color.WHITE);
         lineaNave2.setStrokeWidth(2);
         lineaNave2.setFill(Color.WHITE);
         //Punta ala izaquierda
         Polygon puntaAlaIzq = new Polygon(new double[]{
-            25, 140,
-            20, 180,
-            30, 175
+            -75, 140,
+            -80, 180,
+            -70, 175
         });
         puntaAlaIzq.setFill(Color.CRIMSON);
         //Punta ala derecha
         Polygon puntaAlaDcha = new Polygon(new double[]{
-            175, 140,
-            170, 175,
-            180, 180
+            75, 140,
+            70, 175,
+            80, 180
         });
         puntaAlaDcha.setFill(Color.CRIMSON);
         //Circulo ala iqz
         Circle circuloAlaIqz = new Circle();
-        circuloAlaIqz.setCenterX(62);
+        circuloAlaIqz.setCenterX(-38);
         circuloAlaIqz.setCenterY(137);
         circuloAlaIqz.setRadius(6);
         circuloAlaIqz.setFill(Color.CRIMSON);
         //Circulo ala derecha
         Circle circuloAlaDcha = new Circle();
-        circuloAlaDcha.setCenterX(138);
+        circuloAlaDcha.setCenterX(38);
         circuloAlaDcha.setCenterY(137);
         circuloAlaDcha.setRadius(6);
         circuloAlaDcha.setFill(Color.CRIMSON);
@@ -156,8 +159,8 @@ public class Alien extends Application {
         nave.getChildren().add(circuloAlaDcha);
         
         //Posicionar la nave
-        nave.setLayoutX(posicionNaveX);
-        nave.setLayoutY(posicionNaveY);
+//        nave.setLayoutX(0);
+//        nave.setLayoutY(0);
         //Escalar la nave
         nave.setScaleX(0.4);
         nave.setScaleY(0.4);
@@ -177,11 +180,24 @@ public class Alien extends Application {
         //Posicionar imagen 2
         fondoPantallaView2.setLayoutX(posicionXFondo2);
         fondoPantallaView2.setLayoutY(posicionYFondo2);
+        
+        //Imagen nave enemiga
+        var naveTitan = new Image(getClass().getResourceAsStream("/images/Titan.png"));
+        ImageView naveTitanView = new ImageView(naveTitan);
+        
+        //Escalar nave Titan
+        naveTitanView.setScaleX(0.3);
+        naveTitanView.setScaleY(0.3);
+        //Rotar nave Titan
+        naveTitanView.setRotate(180);
                 
         //Añadir al contenedor
         root.getChildren().add(fondoPantallaView1);
         root.getChildren().add(fondoPantallaView2);
         root.getChildren().add(nave);
+        root.getChildren().add(naveTitanView);
+        
+        
         
         //Movimiento del fondo
         Timeline movimiento = new Timeline(
@@ -205,15 +221,37 @@ public class Alien extends Application {
                 nave.setTranslateY(posicionNaveY);
                 
                 //Comprobar si se sale la nave por la izquierda
-                if (posicionNaveX < -230) {
-                    posicionNaveX = -230;
+                if (posicionNaveX < 50) {
+                    posicionNaveX = 50;
                 }else{
-                    //Cpmprobar que no se sale por la derecha
-                    if (posicionNaveX > 580) {
-                        posicionNaveX = 580;
+                    //Comprobar que no se sale por la derecha
+                    if (posicionNaveX > ANCHO_PANTALLA -50) {
+                        posicionNaveX = ANCHO_PANTALLA -50;
                     }
                 }
-            })
+                
+                //Comprobar si se sale la nave por arriba
+                if (posicionNaveY < 0) {
+                    posicionNaveY = 0;
+                }else{
+                    //Comprobar que no se sale por abajo
+                    if (posicionNaveY > ALTO_PANTALLA -150) {
+                        posicionNaveY = ALTO_PANTALLA -150;
+                    }
+                }
+                //Movimiento naveTitan
+                naveTitanView.setLayoutY(posicionYNaveTitan);
+                posicionYNaveTitan+= 1;
+                //Posicion aleatoria nave Titan
+                if (posicionYNaveTitan > ALTO_PANTALLA) {
+                    posicionYNaveTitan = -200;
+                    
+                    //Random posicionAleatoriaTitan = new Random();
+                        //for(int i=0; i<ANCHO_PANTALLA; i++) {
+                       // ;
+
+                }
+            }) 
         );
         movimiento.setCycleCount (Timeline.INDEFINITE);
         movimiento.play();
