@@ -245,10 +245,7 @@ public class Alien extends Application {
                 //Posicion aleatoria nave Titan
                 if (posicionYNaveTitan > ALTO_PANTALLA) {
                     posicionYNaveTitan = -200;
-                    
-                    //Random posicionAleatoriaTitan = new Random();
-                        //for(int i=0; i<ANCHO_PANTALLA; i++) {
-                       // ;
+                   
 
                 }
             }) 
