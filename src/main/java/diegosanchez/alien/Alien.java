@@ -44,9 +44,17 @@ public class Alien extends Application {
     //Variable para velocidad de movimiento de la nave
     int velocidadNaveX = 0;
     int velocidadNaveY = 0;
-    
+    //Variable para posocion nave Titan
     int posicionYNaveTitan = 0;
-    
+    int posicionXNaveTitan;
+    //Variable para posicion de disparo lazer
+    int posicionXDisparoLazer;
+    int posicionYDisparoLazer;
+    //Variable para disparar
+    boolean dispararLazer = false;
+    int velocidadLazer = 0;
+
+   //audioclip
 
     @Override
     public void start(Stage primeraEtapa) {
@@ -159,11 +167,14 @@ public class Alien extends Application {
         nave.getChildren().add(circuloAlaDcha);
         
         //Posicionar la nave
-//        nave.setLayoutX(0);
-//        nave.setLayoutY(0);
+        //nave.setLayoutX(0);
+        //nave.setLayoutY(0);
+
         //Escalar la nave
         nave.setScaleX(0.4);
         nave.setScaleY(0.4);
+        
+        //System.out.println(nave);
         
         //Imegen 1 de pantalla
         var fondoPantalla1 = new Image(getClass().getResourceAsStream("/images/FondoEstrellas1.png"));
@@ -190,12 +201,21 @@ public class Alien extends Application {
         naveTitanView.setScaleY(0.3);
         //Rotar nave Titan
         naveTitanView.setRotate(180);
-                
+        
+        //Imagen disparo lazer
+        var disparoLazer = new Image(getClass().getResourceAsStream("/images/DisparoLaser.png"));
+        ImageView disparoLazerView = new ImageView(disparoLazer);
+        
+        //Escalar disparo lazer
+        disparoLazerView.setScaleX(0.25);
+        disparoLazerView.setScaleY(0.25); 
+        
         //Añadir al contenedor
         root.getChildren().add(fondoPantallaView1);
         root.getChildren().add(fondoPantallaView2);
-        root.getChildren().add(nave);
         root.getChildren().add(naveTitanView);
+        root.getChildren().add(nave);
+        root.getChildren().add(disparoLazerView);
         
         
         
@@ -231,8 +251,8 @@ public class Alien extends Application {
                 }
                 
                 //Comprobar si se sale la nave por arriba
-                if (posicionNaveY < 0) {
-                    posicionNaveY = 0;
+                if (posicionNaveY < -30) {
+                    posicionNaveY = -30;
                 }else{
                     //Comprobar que no se sale por abajo
                     if (posicionNaveY > ALTO_PANTALLA -150) {
@@ -242,11 +262,28 @@ public class Alien extends Application {
                 //Movimiento naveTitan
                 naveTitanView.setLayoutY(posicionYNaveTitan);
                 posicionYNaveTitan+= 1;
+                naveTitanView.setLayoutX(posicionXNaveTitan);
                 //Posicion aleatoria nave Titan
                 if (posicionYNaveTitan > ALTO_PANTALLA) {
-                    posicionYNaveTitan = -200;
-                   
-
+                    Random randomPosicionXNaveTitan = new Random();
+                    posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+                    System.out.println(posicionXNaveTitan);
+                    posicionYNaveTitan = -250;
+                }
+                
+                //Posicion disparo lazer
+                if (dispararLazer == false && posicionYDisparoLazer > 0) {
+                posicionXDisparoLazer = posicionNaveX - 171;
+                posicionYDisparoLazer = posicionNaveY - 108;
+                }
+                //Posicion disparo lazer
+                disparoLazerView.setLayoutX(posicionXDisparoLazer);                
+                disparoLazerView.setLayoutY(posicionYDisparoLazer);
+                if (dispararLazer == true) {
+                    
+                    posicionYDisparoLazer -= velocidadLazer;
+                    
+                    
                 }
             }) 
         );
@@ -272,6 +309,11 @@ public class Alien extends Application {
                     //Pulsada tecla abajo
                     velocidadNaveY = 5;
                     break;
+                case SPACE:
+                    //Pulsada tecla espacio
+                    dispararLazer = true; 
+                    velocidadLazer = 8;
+                    break;
             }
         });
         //Detección de dejar de pulsar las teclas
@@ -292,6 +334,10 @@ public class Alien extends Application {
                 case DOWN:
                     //Dejar de pulsar tecla abajo
                     velocidadNaveY = 0;
+                    break;
+                case SPACE:
+                    //Dejar de pulsar tecla espacio
+                    dispararLazer = false; 
                     break;
             }
         });
