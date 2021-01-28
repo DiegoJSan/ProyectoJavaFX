@@ -12,20 +12,23 @@ import java.util.Random;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.geometry.Pos;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.media.AudioClip;
-import javafx.scene.media.Media;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -58,7 +61,9 @@ public class Alien extends Application {
     //Variable para disparar
     boolean dispararLazer = false;
     int velocidadLazer = 0;
-    boolean sonidoLazer = false;
+    //boolean sonidoLazer;
+    final int TAMAÑO_LETRAS = 24;
+    Text textoPuntuacion;
 
    //audioclip
 
@@ -216,11 +221,71 @@ public class Alien extends Application {
         disparoLazerView.setScaleX(0.25);
         disparoLazerView.setScaleY(0.25); 
         
-        //Sonido disparo lazer
-        /*AudioClip sonidoLazer = new AudioClip("/Sonidos/SHOOT013.mp3");
-            sonidoLazer.play();*/
-            
-        AudioClip sonidoLazer = new AudioClip(getClass().getResourceAsStream("/Sonidos/SHOOT013.mp3").toString());
+        //Sonido disparo lazer    
+        //AudioClip sonidoLazer = new AudioClip(getClass().getResourceAsStream("/sonidos/SHOOT013.mp3").toString());
+        //AudioClip sonidoLazer = new AudioClip("/sonidos/SHOOT013.mp3");
+        
+        //Crear los marcadores con Layout
+        //Layout principal
+        HBox panePuntuacion = new HBox();
+        panePuntuacion.setTranslateY(20);
+        panePuntuacion.setMinWidth(ANCHO_PANTALLA);
+        panePuntuacion.setAlignment(Pos.CENTER);
+        panePuntuacion.setSpacing(100);
+        
+        //Layout para puntuación actual
+        HBox panePuntuacionActual = new HBox();
+        panePuntuacionActual.setSpacing(10);
+        panePuntuacion.getChildren().add(panePuntuacionActual);
+        
+        //Layout para puntuación máxima
+        HBox panePuntuacionMax = new HBox();
+        panePuntuacionMax.setSpacing(10);
+        panePuntuacion.getChildren().add(panePuntuacionMax);
+        
+        //Layout para vidas
+        HBox paneVidas = new HBox();
+        paneVidas.setSpacing(10);
+        panePuntuacion.getChildren().add(paneVidas);
+        
+        //Texo de etiqueta para la puntuación
+        Text textoPuntos = new Text ("Puntos:");
+        textoPuntos.setFont(Font.font(TAMAÑO_LETRAS));
+        textoPuntos.setFill(Color.WHITE);
+        
+        //Texo para la puntuación
+        textoPuntuacion = new Text ("0");
+        textoPuntuacion.setFont(Font.font(TAMAÑO_LETRAS));
+        textoPuntuacion.setFill(Color.WHITE);
+        
+        //Texto de etiqueta para la puntuación máxima
+        Text textoPuntosMax = new Text("Max.Puntuación:");
+        textoPuntosMax.setFont(Font.font(TAMAÑO_LETRAS));
+        textoPuntosMax.setFill(Color.WHITE);
+        
+        //Texto para la puntuación máxima
+        Text textoPuntuacionMax = new Text("0");
+        textoPuntuacionMax.setFont(Font.font(TAMAÑO_LETRAS));
+        textoPuntuacionMax.setFill(Color.WHITE);
+        
+        //Texto de etiqueta para Vida
+        Text textoVidas = new Text("Vidas:");
+        textoVidas.setFont(Font.font(TAMAÑO_LETRAS));
+        textoVidas.setFill(Color.WHITE);
+        
+        //Texto para Vida
+        Text textoNumeroVidas = new Text("0");
+        textoNumeroVidas.setFont(Font.font(TAMAÑO_LETRAS));
+        textoNumeroVidas.setFill(Color.WHITE);
+        
+        //Añadir los textos a los Layout reservados para ello
+        panePuntuacionActual.getChildren().add(textoPuntos);
+        panePuntuacionActual.getChildren().add(textoPuntuacion);
+        panePuntuacionMax.getChildren().add(textoPuntosMax);
+        panePuntuacionMax.getChildren().add(textoPuntuacionMax);
+        paneVidas.getChildren().add(textoVidas);
+        paneVidas.getChildren().add(textoNumeroVidas);
+        
         
         //Añadir al contenedor
         root.getChildren().add(fondoPantallaView1);
@@ -229,6 +294,7 @@ public class Alien extends Application {
         root.getChildren().add(nave);
         root.getChildren().add(disparoLazerView);
         //root.getChildren().add(sonidoLazer);
+        root.getChildren().add(panePuntuacion);
         
         
         
@@ -291,11 +357,10 @@ public class Alien extends Application {
                 //Posición disparo lazer
                 disparoLazerView.setLayoutX(posicionXDisparoLazer);                
                 disparoLazerView.setLayoutY(posicionYDisparoLazer);
-                if (dispararLazer == true ) {
-                    for(int i=posicionYDisparoLazer; i<=0; i+= 2) {                   
-                        posicionYDisparoLazer = i;
-                    }
+                if (dispararLazer == true ) {                
+                    posicionYDisparoLazer -= velocidadLazer;
                     velocidadLazer = 8;
+                
                     /*while (posicionYDisparoLazer > 0) {
                         dispararLazer = true;
                     }*/
@@ -328,7 +393,7 @@ public class Alien extends Application {
                 case SPACE:
                     //Pulsada tecla espacio
                     dispararLazer = true; 
-                    
+                    // sonidoLazer.play();
                     break;
             }
         });
