@@ -58,7 +58,7 @@ public class Alien extends Application {
     //Variable para disparar
     boolean dispararLazer = false;
     int velocidadLazer = 0;
-    boolean sonidoLazer = false
+    boolean sonidoLazer = false;
 
    //audioclip
 
@@ -228,7 +228,7 @@ public class Alien extends Application {
         root.getChildren().add(naveTitanView);
         root.getChildren().add(nave);
         root.getChildren().add(disparoLazerView);
-        root.getChildren().add(disparoLazerView);
+        //root.getChildren().add(sonidoLazer);
         
         
         
@@ -292,8 +292,10 @@ public class Alien extends Application {
                 disparoLazerView.setLayoutX(posicionXDisparoLazer);                
                 disparoLazerView.setLayoutY(posicionYDisparoLazer);
                 if (dispararLazer == true ) {
+                    for(int i=posicionYDisparoLazer; i<=0; i+= 2) {                   
+                        posicionYDisparoLazer = i;
+                    }
                     velocidadLazer = 8;
-                    posicionYDisparoLazer -= velocidadLazer;
                     /*while (posicionYDisparoLazer > 0) {
                         dispararLazer = true;
                     }*/
