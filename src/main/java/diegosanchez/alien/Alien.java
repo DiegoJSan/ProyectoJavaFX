@@ -317,7 +317,7 @@ public class Alien extends Application {
         textoVidas.setFill(Color.RED);
         
         //Texto para Vida
-        Text textoNumeroVidas = new Text("0");
+        Text textoNumeroVidas = new Text("3");
         textoNumeroVidas.setFont(Font.font(TAMAÑO_LETRAS));
         textoNumeroVidas.setFill(Color.WHITE);
         
