@@ -221,7 +221,7 @@ public class Alien extends Application {
         var naveTitan = new Image(getClass().getResourceAsStream("/images/Titan.png"));
         ImageView naveTitanView = new ImageView(naveTitan);
         
-        //Zona decontacto nave Titan
+        //29-01-2021 Zona de contacto nave Titan
         Polygon zonaContactoTitan = new Polygon(new double[]{
             0.0, 0.0,
             -140.0, 300.0,
