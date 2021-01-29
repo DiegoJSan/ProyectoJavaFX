@@ -27,6 +27,7 @@ import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -62,8 +63,11 @@ public class Alien extends Application {
     boolean dispararLazer = false;
     int velocidadLazer = 0;
     //boolean sonidoLazer;
+    //Variables y Constante para puntuación
     final int TAMAÑO_LETRAS = 24;
     Text textoPuntuacion;
+    int vidas = 3;
+    int puntos = 0;
 
    //audioclip
 
@@ -71,12 +75,14 @@ public class Alien extends Application {
     public void start(Stage primeraEtapa) {
         //Crear el contenedor para poner los objetos
         Pane root = new Pane();
+        
         //Crear la escena(ventana)
         Scene escena = new Scene(root, ANCHO_PANTALLA, ALTO_PANTALLA, Color.BLACK);
         primeraEtapa.setResizable(false);
         primeraEtapa.setTitle("Alien");
         primeraEtapa.setScene(escena);
         primeraEtapa.show();
+        
         //Crear nave espacial
         //Pico nave
         Polygon picoNave = new Polygon(new double[]{
@@ -159,10 +165,19 @@ public class Alien extends Application {
         circuloAlaDcha.setCenterX(38);
         circuloAlaDcha.setCenterY(137);
         circuloAlaDcha.setRadius(6);
-        circuloAlaDcha.setFill(Color.CRIMSON);
+        circuloAlaDcha.setFill(Color.CRIMSON);       
+        //Zona de contacto nave
+        Polygon zonaContactoNave = new Polygon(new double[]{
+            0.0, 15.0,
+            -75.0, 170.0,
+            75.0, 170.0 
+        }); 
+        zonaContactoNave.setFill(Color.YELLOW);
+        zonaContactoNave.setVisible(false);
         
         //Agrupar todos los objetos de la nave
         Group nave = new Group();
+        nave.getChildren().add(zonaContactoNave);
         nave.getChildren().add(picoNave);
         nave.getChildren().add(cuerpoNave);
         nave.getChildren().add(alaIzqNave);
@@ -177,6 +192,7 @@ public class Alien extends Application {
         nave.getChildren().add(circuloAlaIqz);
         nave.getChildren().add(circuloAlaDcha);
         
+        
         //Posicionar la nave
         //nave.setLayoutX(0);
         //nave.setLayoutY(0);
@@ -184,8 +200,6 @@ public class Alien extends Application {
         //Escalar la nave
         nave.setScaleX(0.4);
         nave.setScaleY(0.4);
-        
-        //System.out.println(nave);
         
         //Imegen 1 de pantalla
         var fondoPantalla1 = new Image(getClass().getResourceAsStream("/images/FondoEstrellas1.png"));
@@ -207,23 +221,52 @@ public class Alien extends Application {
         var naveTitan = new Image(getClass().getResourceAsStream("/images/Titan.png"));
         ImageView naveTitanView = new ImageView(naveTitan);
         
+        //Zona decontacto nave Titan
+        Polygon zonaContactoTitan = new Polygon(new double[]{
+            0.0, 0.0,
+            -140.0, 300.0,
+            140.0, 300.0 
+        }); 
+        zonaContactoTitan.setFill(Color.YELLOW);
+        zonaContactoTitan.setVisible(false);
+        zonaContactoTitan.setLayoutX(140);
+        
+        //Agrupar imagen y objetos de la nave Titan
+        Group grupoNaveTitan = new Group();
+        grupoNaveTitan.getChildren().add(zonaContactoTitan);
+        grupoNaveTitan.getChildren().add(naveTitanView);
+        
         //Escalar nave Titan
-        naveTitanView.setScaleX(0.3);
-        naveTitanView.setScaleY(0.3);
+        grupoNaveTitan.setScaleX(0.3);
+        grupoNaveTitan.setScaleY(0.3);
         //Rotar nave Titan
-        naveTitanView.setRotate(180);
+        grupoNaveTitan.setRotate(180);
         
         //Imagen disparo lazer
         var disparoLazer = new Image(getClass().getResourceAsStream("/images/DisparoLaser.png"));
         ImageView disparoLazerView = new ImageView(disparoLazer);
         
+        //Zona decontacto nave Titan
+        Circle ZonaContactoDisparoLazer = new Circle();
+        ZonaContactoDisparoLazer.setCenterX(86);
+        ZonaContactoDisparoLazer.setCenterY(115);
+        ZonaContactoDisparoLazer.setRadius(20);
+        ZonaContactoDisparoLazer.setFill(Color.YELLOW);
+        ZonaContactoDisparoLazer.setVisible(false);
+        
+        
+        //Agrupar imagen y objetos de la nave Titan
+        Group grupoDisparoLazer = new Group();
+        grupoDisparoLazer.getChildren().add(disparoLazerView);
+        grupoDisparoLazer.getChildren().add(ZonaContactoDisparoLazer);
+        
         //Escalar disparo lazer
-        disparoLazerView.setScaleX(0.25);
-        disparoLazerView.setScaleY(0.25); 
+        grupoDisparoLazer.setScaleX(0.25);
+        grupoDisparoLazer.setScaleY(0.25); 
         
         //Sonido disparo lazer    
         //AudioClip sonidoLazer = new AudioClip(getClass().getResourceAsStream("/sonidos/SHOOT013.mp3").toString());
-        //AudioClip sonidoLazer = new AudioClip("/sonidos/SHOOT013.mp3");
+        //AudioClip sonidoLazer = new AudioClip("\"D:\DAW\PROGRAMACIÓN\Sonidos\Sound Effects Shooting sounds 002\SHOOT013.mp3\"");
         
         //Crear los marcadores con Layout
         //Layout principal
@@ -251,7 +294,7 @@ public class Alien extends Application {
         //Texo de etiqueta para la puntuación
         Text textoPuntos = new Text ("Puntos:");
         textoPuntos.setFont(Font.font(TAMAÑO_LETRAS));
-        textoPuntos.setFill(Color.WHITE);
+        textoPuntos.setFill(Color.GREEN);
         
         //Texo para la puntuación
         textoPuntuacion = new Text ("0");
@@ -261,7 +304,7 @@ public class Alien extends Application {
         //Texto de etiqueta para la puntuación máxima
         Text textoPuntosMax = new Text("Max.Puntuación:");
         textoPuntosMax.setFont(Font.font(TAMAÑO_LETRAS));
-        textoPuntosMax.setFill(Color.WHITE);
+        textoPuntosMax.setFill(Color.BLUE);
         
         //Texto para la puntuación máxima
         Text textoPuntuacionMax = new Text("0");
@@ -271,7 +314,7 @@ public class Alien extends Application {
         //Texto de etiqueta para Vida
         Text textoVidas = new Text("Vidas:");
         textoVidas.setFont(Font.font(TAMAÑO_LETRAS));
-        textoVidas.setFill(Color.WHITE);
+        textoVidas.setFill(Color.RED);
         
         //Texto para Vida
         Text textoNumeroVidas = new Text("0");
@@ -290,11 +333,12 @@ public class Alien extends Application {
         //Añadir al contenedor
         root.getChildren().add(fondoPantallaView1);
         root.getChildren().add(fondoPantallaView2);
-        root.getChildren().add(naveTitanView);
+        root.getChildren().add(grupoNaveTitan);
         root.getChildren().add(nave);
-        root.getChildren().add(disparoLazerView);
+        root.getChildren().add(grupoDisparoLazer);
         //root.getChildren().add(sonidoLazer);
         root.getChildren().add(panePuntuacion);
+        //root.getChildren().add(ZonaContactoDisparoLazer);
         
         
         
@@ -339,9 +383,9 @@ public class Alien extends Application {
                     }
                 }
                 //Movimiento naveTitan
-                naveTitanView.setLayoutY(posicionYNaveTitan);
+                grupoNaveTitan.setLayoutY(posicionYNaveTitan);
                 posicionYNaveTitan+= 1;
-                naveTitanView.setLayoutX(posicionXNaveTitan);
+                grupoNaveTitan.setLayoutX(posicionXNaveTitan);
                 //Posición aleatoria nave Titan
                 if (posicionYNaveTitan > ALTO_PANTALLA) {
                     posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
@@ -355,8 +399,8 @@ public class Alien extends Application {
                 posicionYDisparoLazer = posicionNaveY - 108;
                 }
                 //Posición disparo lazer
-                disparoLazerView.setLayoutX(posicionXDisparoLazer);                
-                disparoLazerView.setLayoutY(posicionYDisparoLazer);
+                grupoDisparoLazer.setLayoutX(posicionXDisparoLazer);                
+                grupoDisparoLazer.setLayoutY(posicionYDisparoLazer);
                 if (dispararLazer == true ) {                
                     posicionYDisparoLazer -= velocidadLazer;
                     velocidadLazer = 8;
@@ -364,6 +408,36 @@ public class Alien extends Application {
                     /*while (posicionYDisparoLazer > 0) {
                         dispararLazer = true;
                     }*/
+                    
+                }
+                
+                //Sentencia para comprobar si hay colición entre nave y nave Titan
+                Shape shapeColisionNaveGrupoNaveTitan = Shape.intersect(zonaContactoNave, zonaContactoTitan);
+                //Variable para saber si hay colición
+                boolean colisionNaveGrupoNaveTitan = shapeColisionNaveGrupoNaveTitan.getBoundsInLocal().isEmpty();
+                //Sentencia para saber si colicionan la nave y la nave Titan
+                if (colisionNaveGrupoNaveTitan == false) {
+                    //Perdida de vidas
+                    vidas--;
+                    textoNumeroVidas.setText(String.valueOf(vidas));
+                    posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+                    System.out.println(posicionXNaveTitan);
+                    posicionYNaveTitan = -250;
+                    
+                }
+                
+                //Sentencia para comprobar si hay colición entre disparo lazer y nave Titan
+                Shape shapeColisionGrupoDisparoLazerGrupoNaveTitan = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoTitan);
+                //Variable para saber si hay colición
+                boolean colisionGrupoDisparoLazerGrupoNaveTitan = shapeColisionGrupoDisparoLazerGrupoNaveTitan.getBoundsInLocal().isEmpty();
+                //Sentencia para saber si colicionan la nave y la nave Titan
+                if (colisionGrupoDisparoLazerGrupoNaveTitan == false) {
+                    //Perdida de vidas
+                    puntos ++;
+                    textoPuntuacion.setText(String.valueOf(puntos));
+                    posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+                    System.out.println(posicionXNaveTitan);
+                    posicionYNaveTitan = -250;
                     
                 }
             }) 
@@ -393,7 +467,7 @@ public class Alien extends Application {
                 case SPACE:
                     //Pulsada tecla espacio
                     dispararLazer = true; 
-                    // sonidoLazer.play();
+                    //sonidoLazer.play();
                     break;
             }
         });
