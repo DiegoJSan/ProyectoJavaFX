@@ -65,14 +65,18 @@ public class Alien extends Application {
     int posicionYDisparoLazer;
     //Variable para disparar
     boolean dispararLazer = false;
+    int estadoEspacio = 0;
+    int ultimoEstadoEspacio = 0;
+    int estadoDisparo;
     int velocidadLazer = 0;
     //Variables y Constante para puntuación
     final int TAMAÑO_LETRAS = 24;
     Text textoPuntuacion;
     int vidas = 3;
     int puntos = 0;
-
-   //audioclip
+    //Variable para coliciones
+    boolean colisionGrupoDisparoLazerGrupoNaveTitan;
+   
 
     @Override
     public void start(Stage primeraEtapa) {
@@ -437,27 +441,47 @@ public class Alien extends Application {
                 //Posición aleatoria nave Blue
                 if (posicionYNaveBlue > ALTO_PANTALLA) {
                     posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+                    System.out.print('P');
                     System.out.println(posicionXNaveBlue);
-                    posicionXNaveBlue = -250;
+                    posicionYNaveBlue = -250;
                 }
                 
                 //Posición disparo lazer
-                if (dispararLazer == false) {
+                /*if (dispararLazer == false) {
                 posicionXDisparoLazer = posicionNaveX - 171;
                 posicionYDisparoLazer = posicionNaveY - 108;
-                }
+                }*/
                 //Posición disparo lazer
                 grupoDisparoLazer.setLayoutX(posicionXDisparoLazer);                
                 grupoDisparoLazer.setLayoutY(posicionYDisparoLazer);
-                if (dispararLazer == true ) {                
-                    posicionYDisparoLazer -= velocidadLazer;
-                    velocidadLazer = 8;
                 
-                    /*while (posicionYDisparoLazer > 0) {
-                        dispararLazer = true;
-                    }*/
-                    
+                //Disparar con espacio
+                if (dispararLazer == true ) {                
+                    estadoEspacio = 1;
                 }
+                
+                if ((estadoEspacio == 1) && (ultimoEstadoEspacio == 0)){
+                    estadoDisparo = 1 - estadoDisparo;
+                }
+                ultimoEstadoEspacio = estadoEspacio;
+                if (estadoDisparo == 1){
+                    posicionYDisparoLazer -= velocidadLazer;
+                    velocidadLazer = 8; 
+                }
+                 else {
+                    posicionXDisparoLazer = posicionNaveX - 171;
+                    posicionYDisparoLazer = posicionNaveY - 108;                
+                }
+                
+                if ((posicionYDisparoLazer < -180) || (colisionGrupoDisparoLazerGrupoNaveTitan == false)){
+                    posicionXDisparoLazer = posicionNaveX - 171;
+                    posicionYDisparoLazer = posicionNaveY - 108;
+                    estadoDisparo = 0;
+                }
+                
+                /*while ( velocidadLazer > 0) {
+                    dispararLazer = true;
+                }*/
                 
                 //Sentencia para comprobar si hay colición entre nave y nave Titan
                 Shape shapeColisionNaveGrupoNaveTitan = Shape.intersect(zonaContactoNave, zonaContactoTitan);
@@ -541,6 +565,7 @@ public class Alien extends Application {
                 case SPACE:
                     //Dejar de pulsar tecla espacio
                     dispararLazer = false; 
+                    ultimoEstadoEspacio = 0;
                     break;
             }
         });
