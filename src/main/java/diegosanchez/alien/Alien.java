@@ -299,7 +299,7 @@ public class Alien extends Application {
         grupoDisparoLazer.setScaleX(0.25);
         grupoDisparoLazer.setScaleY(0.25); 
         
-        //Sonido disparo lazer    
+        //Sonido disparo lazer //   
         //AudioClip sonidoLazer = new AudioClip(getClass().getResourceAsStream("/sonidos/SHOOT013.mp3").toString());
         //AudioClip sonidoLazer = new AudioClip("\"D:\DAW\PROGRAMACIÓN\Sonidos\Sound Effects Shooting sounds 002\SHOOT013.mp3\"");
         
