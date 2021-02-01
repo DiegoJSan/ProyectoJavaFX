@@ -8,6 +8,8 @@ Diego Jesús Sánchez Del Corral
 
 package diegosanchez.alien;
 
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Random;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
@@ -20,6 +22,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
@@ -60,6 +63,10 @@ public class Alien extends Application {
     int posicionYNaveBlue = -250;
     Random randomPosicionXNaveBlue = new Random();
         int posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+    //Variable para posocion Asteroide1
+    int posicionYAsteroide1 = -250;
+    Random randomPosicionXAsteroide1 = new Random();
+        int posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA);
     //Variable para posicion de disparo lazer
     int posicionXDisparoLazer;
     int posicionYDisparoLazer;
@@ -69,13 +76,15 @@ public class Alien extends Application {
     int ultimoEstadoEspacio = 0;
     int estadoDisparo;
     int velocidadLazer = 0;
+    boolean retornoLazer;
+
     //Variables y Constante para puntuación
     final int TAMAÑO_LETRAS = 24;
     Text textoPuntuacion;
     int vidas = 3;
     int puntos = 0;
     //Variable para coliciones
-    boolean colisionGrupoDisparoLazerGrupoNaveTitan;
+    //boolean colisionGrupoDisparoLazerGrupoNaveTitan;
    
 
     @Override
@@ -274,7 +283,7 @@ public class Alien extends Application {
             35.0, 75.0
         });
         zonaContactoBlue.setFill(Color.YELLOW);
-        zonaContactoBlue.setVisible(true);
+        zonaContactoBlue.setVisible(false);
         zonaContactoBlue.setLayoutX(75);
         zonaContactoBlue.setLayoutY(0);
         
@@ -289,6 +298,36 @@ public class Alien extends Application {
         
         //Rotar nave Blue
         grupoNaveBlue.setRotate(180);
+        
+        //Imagen nave Asteroide1
+        var asteroide1 = new Image(getClass().getResourceAsStream("/images/Asteroide_1.png"));
+        ImageView Asteroide1View = new ImageView(asteroide1);
+        
+        //Zona de contacto Asteroide1
+        Polyline zonaContactoAsteroide1 = new Polyline();
+        zonaContactoAsteroide1.getPoints().addAll(new Double[]{
+            0.0, 0.0,
+            -150.0, 20.0,
+            -300.0, 250.0 ,
+            -180.0, 380.0,
+            0.0, 455.0,
+            235.0, 260.0,
+            140.0, 75.0,
+            0.0, 0.0,
+        });
+        zonaContactoAsteroide1.setFill(Color.YELLOW);
+        zonaContactoAsteroide1.setVisible(false);
+        zonaContactoAsteroide1.setLayoutX(300);
+        zonaContactoAsteroide1.setLayoutY(0);
+        
+        //Agrupar imagen y objetos de Asteroide1
+        Group grupoAsteroide1 = new Group();
+        grupoAsteroide1.getChildren().add(zonaContactoAsteroide1);
+        grupoAsteroide1.getChildren().add(Asteroide1View);
+        
+        //Escalar Asteroide 1
+        grupoAsteroide1.setScaleX(0.15);
+        grupoAsteroide1.setScaleY(0.15);
                 
         //Imagen disparo lazer
         var disparoLazer = new Image(getClass().getResourceAsStream("/images/DisparoLaser.png"));
@@ -304,8 +343,17 @@ public class Alien extends Application {
         grupoDisparoLazer.setScaleY(0.25); 
         
         //Sonido disparo lazer //   
-        //AudioClip sonidoLazer = new AudioClip(getClass().getResourceAsStream("/sonidos/SHOOT013.mp3").toString());
-        //AudioClip sonidoLazer = new AudioClip("\"D:\DAW\PROGRAMACIÓN\Sonidos\Sound Effects Shooting sounds 002\SHOOT013.mp3\"");
+        URL urlAudio = getClass().getResource("/sonidos/SHOOT013.mp3.mp3");
+        if(urlAudio != null) {
+            try {
+                AudioClip sonidoLazer = new AudioClip(urlAudio.toURI().toString());
+                sonidoLazer.play();
+            } catch (URISyntaxException ex) {
+                System.out.println("Error en el formato de ruta de archivo de audio");
+            }            
+        } else {
+        System.out.println("No se ha encontrado el archivo de audio");
+        }
         
         //Crear los marcadores con Layout
         //Layout principal
@@ -374,15 +422,15 @@ public class Alien extends Application {
         root.getChildren().add(fondoPantallaView2);
         root.getChildren().add(grupoNaveTitan);
         root.getChildren().add(grupoNaveBlue);
-        root.getChildren().add(nave);
+        root.getChildren().add(grupoAsteroide1);
         root.getChildren().add(grupoDisparoLazer);
-        //root.getChildren().add(sonidoLazer);
+        root.getChildren().add(nave);
         root.getChildren().add(panePuntuacion);
-        //root.getChildren().add(naveBlueView);
+        
+        //root.getChildren().add(Asteroide1View);
         
         
-        
-        
+                                     
         //Animación
         Timeline movimiento = new Timeline(
             //Movimiento del fondo comprobando que ha llegado al final de la pantalla
@@ -432,6 +480,8 @@ public class Alien extends Application {
                     posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
                     System.out.println(posicionXNaveTitan);
                     posicionYNaveTitan = -250;
+                    puntos --;
+                    textoPuntuacion.setText(String.valueOf(puntos));
                 }
                 
                 //Movimiento nave Blue
@@ -444,44 +494,21 @@ public class Alien extends Application {
                     System.out.print('P');
                     System.out.println(posicionXNaveBlue);
                     posicionYNaveBlue = -250;
+                    puntos --;
+                    textoPuntuacion.setText(String.valueOf(puntos));
                 }
                 
-                //Posición disparo lazer
-                /*if (dispararLazer == false) {
-                posicionXDisparoLazer = posicionNaveX - 171;
-                posicionYDisparoLazer = posicionNaveY - 108;
-                }*/
-                //Posición disparo lazer
-                grupoDisparoLazer.setLayoutX(posicionXDisparoLazer);                
-                grupoDisparoLazer.setLayoutY(posicionYDisparoLazer);
-                
-                //Disparar con espacio
-                if (dispararLazer == true ) {                
-                    estadoEspacio = 1;
+                //Movimiento Asteroide1
+                grupoAsteroide1.setLayoutY(posicionYAsteroide1);
+                posicionYAsteroide1 += 3;
+                grupoAsteroide1.setLayoutX(posicionXAsteroide1);
+                posicionXAsteroide1 -= 1;
+                //Posición aleatoria Asteroide1
+                if (posicionYAsteroide1 > ALTO_PANTALLA) {
+                    posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA + 200);
+                    System.out.println(posicionXAsteroide1);
+                    posicionYAsteroide1 = -250;
                 }
-                
-                if ((estadoEspacio == 1) && (ultimoEstadoEspacio == 0)){
-                    estadoDisparo = 1 - estadoDisparo;
-                }
-                ultimoEstadoEspacio = estadoEspacio;
-                if (estadoDisparo == 1){
-                    posicionYDisparoLazer -= velocidadLazer;
-                    velocidadLazer = 8; 
-                }
-                 else {
-                    posicionXDisparoLazer = posicionNaveX - 171;
-                    posicionYDisparoLazer = posicionNaveY - 108;                
-                }
-                
-                if ((posicionYDisparoLazer < -180) || (colisionGrupoDisparoLazerGrupoNaveTitan == false)){
-                    posicionXDisparoLazer = posicionNaveX - 171;
-                    posicionYDisparoLazer = posicionNaveY - 108;
-                    estadoDisparo = 0;
-                }
-                
-                /*while ( velocidadLazer > 0) {
-                    dispararLazer = true;
-                }*/
                 
                 //Sentencia para comprobar si hay colición entre nave y nave Titan
                 Shape shapeColisionNaveGrupoNaveTitan = Shape.intersect(zonaContactoNave, zonaContactoTitan);
@@ -498,19 +525,110 @@ public class Alien extends Application {
                     
                 }
                 
+                //Sentencia para comprobar si hay colición entre nave y nave Blue
+                Shape shapeColisionNaveGrupoNaveBlue = Shape.intersect(zonaContactoNave, zonaContactoBlue);
+                //Variable para saber si hay colición
+                boolean colisionNaveGrupoNaveBlue = shapeColisionNaveGrupoNaveBlue.getBoundsInLocal().isEmpty();
+                //Sentencia para saber si colicionan la nave y la nave Blue
+                if (colisionNaveGrupoNaveBlue == false) {
+                    //Perdida de vidas
+                    vidas--;
+                    textoNumeroVidas.setText(String.valueOf(vidas));
+                    posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+                    System.out.println(posicionXNaveBlue);
+                    posicionYNaveBlue = -250;
+                    
+                }
+                
+                //Sentencia para comprobar si hay colición entre nave y Asteroide1
+                Shape shapeColisionNaveGrupoAsteroide1 = Shape.intersect(zonaContactoNave, zonaContactoAsteroide1);
+                //Variable para saber si hay colición
+                boolean colisionNaveGrupoAsteroide1 = shapeColisionNaveGrupoAsteroide1.getBoundsInLocal().isEmpty();
+                //Sentencia para saber si colicionan la nave y la nave Blue
+                if (colisionNaveGrupoAsteroide1 == false) {
+                    //Perdida de vidas
+                    vidas--;
+                    textoNumeroVidas.setText(String.valueOf(vidas));
+                    posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA + 150);
+                    System.out.println(posicionXAsteroide1);
+                    posicionYAsteroide1 = -250;
+                    
+                }
+                
                 //Sentencia para comprobar si hay colición entre disparo lazer y nave Titan
                 Shape shapeColisionGrupoDisparoLazerGrupoNaveTitan = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoTitan);
                 //Variable para saber si hay colición
                 boolean colisionGrupoDisparoLazerGrupoNaveTitan = shapeColisionGrupoDisparoLazerGrupoNaveTitan.getBoundsInLocal().isEmpty();
                 //Sentencia para saber si colicionan la nave y la nave Titan
                 if ((colisionGrupoDisparoLazerGrupoNaveTitan == false) && (colisionNaveGrupoNaveTitan == true)) {
-                    //Perdida de vidas               
+                    //Perdida de vidas 
+                    retornoLazer = true;
                     puntos ++;
                     textoPuntuacion.setText(String.valueOf(puntos));
                     posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
                     System.out.println(posicionXNaveTitan);
                     posicionYNaveTitan = -250;
                     
+                }
+                
+                //Sentencia para comprobar si hay colición entre disparo lazer y nave Blue
+                Shape shapeColisionGrupoDisparoLazerGrupoNaveBlue = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoBlue);
+                //Variable para saber si hay colición
+                boolean colisionGrupoDisparoLazerGrupoNaveBlue = shapeColisionGrupoDisparoLazerGrupoNaveBlue.getBoundsInLocal().isEmpty();
+                //Sentencia para saber si colicionan la nave y la nave Blue
+                if ((colisionGrupoDisparoLazerGrupoNaveBlue == false) && (colisionNaveGrupoNaveBlue == true)) {
+                    //Perdida de vidas 
+                    retornoLazer = true;
+                    puntos ++;
+                    textoPuntuacion.setText(String.valueOf(puntos));
+                    posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+                    System.out.println(posicionXNaveBlue);
+                    posicionYNaveBlue = -250;
+                    
+                }
+                
+                //Sentencia para comprobar si hay colición entre disparo lazer y Asteroide1
+                Shape shapeColisionGrupoDisparoLazerGrupoAsteroide1 = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoAsteroide1);
+                //Variable para saber si hay colición
+                boolean colisionGrupoDisparoLazerGrupoAsteroide1 = shapeColisionGrupoDisparoLazerGrupoAsteroide1.getBoundsInLocal().isEmpty();
+                //Sentencia para saber si colicionan lazer y Asteroide1
+                if ((colisionGrupoDisparoLazerGrupoAsteroide1 == false) && (colisionNaveGrupoAsteroide1 == true)) {
+                    
+                    retornoLazer = true;
+                }
+                //Posición disparo lazer
+                /*if (dispararLazer == false) {
+                posicionXDisparoLazer = posicionNaveX - 171;
+                posicionYDisparoLazer = posicionNaveY - 108;
+                }*/
+                //Posición disparo lazer
+                grupoDisparoLazer.setLayoutX(posicionXDisparoLazer);                
+                grupoDisparoLazer.setLayoutY(posicionYDisparoLazer);
+                
+                //Disparar con espacio
+                if (dispararLazer == true) {                
+                    estadoEspacio = 1;
+                }
+                
+                if ((estadoEspacio == 1) && (ultimoEstadoEspacio == 0)){
+                    estadoDisparo = 1 - estadoDisparo;
+                }
+                ultimoEstadoEspacio = estadoEspacio;
+                if (estadoDisparo == 1){
+                    posicionYDisparoLazer -= velocidadLazer;
+                    velocidadLazer = 8; 
+                    //sonidoLazer.play();
+                }
+                 else {
+                    posicionXDisparoLazer = posicionNaveX - 171;
+                    posicionYDisparoLazer = posicionNaveY - 108;                
+                }
+                
+                if ((posicionYDisparoLazer < -180) || (retornoLazer == true)){
+                    posicionXDisparoLazer = posicionNaveX - 171;
+                    posicionYDisparoLazer = posicionNaveY - 108;
+                    estadoDisparo = 0;
+                    retornoLazer = false;
                 }
             }) 
         );
@@ -539,7 +657,6 @@ public class Alien extends Application {
                 case SPACE:
                     //Pulsada tecla espacio
                     dispararLazer = true; 
-                    //sonidoLazer.play();
                     break;
             }
         });
