@@ -20,12 +20,12 @@ import javafx.scene.image.ImageView;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
-import javafx.scene.media.AudioClip;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Ellipse;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
+import javafx.scene.shape.Polyline;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.Shape;
 import javafx.scene.text.Font;
@@ -56,13 +56,16 @@ public class Alien extends Application {
     int posicionYNaveTitan = -250;
     Random randomPosicionXNaveTitan = new Random();
         int posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+    //Variable para posocion nave Blue
+    int posicionYNaveBlue = -250;
+    Random randomPosicionXNaveBlue = new Random();
+        int posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
     //Variable para posicion de disparo lazer
     int posicionXDisparoLazer;
     int posicionYDisparoLazer;
     //Variable para disparar
     boolean dispararLazer = false;
     int velocidadLazer = 0;
-    //boolean sonidoLazer;
     //Variables y Constante para puntuación
     final int TAMAÑO_LETRAS = 24;
     Text textoPuntuacion;
@@ -217,7 +220,7 @@ public class Alien extends Application {
         fondoPantallaView2.setLayoutX(posicionXFondo2);
         fondoPantallaView2.setLayoutY(posicionYFondo2);
         
-        //Imagen nave enemiga
+        //Imagen nave Titan
         var naveTitan = new Image(getClass().getResourceAsStream("/images/Titan.png"));
         ImageView naveTitanView = new ImageView(naveTitan);
         
@@ -242,19 +245,51 @@ public class Alien extends Application {
         //Rotar nave Titan
         grupoNaveTitan.setRotate(180);
         
-        //Imagen disparo lazer
-        var disparoLazer = new Image(getClass().getResourceAsStream("/images/DisparoLaser.png"));
-        ImageView disparoLazerView = new ImageView(disparoLazer);
-        
-        //Zona decontacto nave Titan
+        //Zona decontacto disparo lazer
         Circle ZonaContactoDisparoLazer = new Circle();
         ZonaContactoDisparoLazer.setCenterX(86);
         ZonaContactoDisparoLazer.setCenterY(115);
         ZonaContactoDisparoLazer.setRadius(20);
         ZonaContactoDisparoLazer.setFill(Color.YELLOW);
-        ZonaContactoDisparoLazer.setVisible(false);
+        ZonaContactoDisparoLazer.setVisible(false);       
         
+        //Imagen nave Blue
+        var naveBlue = new Image(getClass().getResourceAsStream("/images/Blue.png"));
+        ImageView naveBlueView = new ImageView(naveBlue);
         
+        //Zona de contacto nave Blue
+        Polyline zonaContactoBlue = new Polyline();
+        zonaContactoBlue.getPoints().addAll(new Double[]{
+            0.0, 22.0,
+            -35.0, 75.0,
+            -40.0, 0.0 ,
+            -70.0, 75.0,
+            0.0, 110.0,
+            70.0, 75.0,
+            40.0, 0.0,
+            35.0, 75.0
+        });
+        zonaContactoBlue.setFill(Color.YELLOW);
+        zonaContactoBlue.setVisible(true);
+        zonaContactoBlue.setLayoutX(75);
+        zonaContactoBlue.setLayoutY(0);
+        
+        //Agrupar imagen y objetos de la nave Blue
+        Group grupoNaveBlue = new Group();
+        grupoNaveBlue.getChildren().add(zonaContactoBlue);
+        grupoNaveBlue.getChildren().add(naveBlueView);
+        
+        //Escalar nave Blue
+        grupoNaveBlue.setScaleX(0.6);
+        grupoNaveBlue.setScaleY(0.6);
+        
+        //Rotar nave Blue
+        grupoNaveBlue.setRotate(180);
+                
+        //Imagen disparo lazer
+        var disparoLazer = new Image(getClass().getResourceAsStream("/images/DisparoLaser.png"));
+        ImageView disparoLazerView = new ImageView(disparoLazer);
+                
         //Agrupar imagen y objetos de la nave Titan
         Group grupoDisparoLazer = new Group();
         grupoDisparoLazer.getChildren().add(disparoLazerView);
@@ -334,11 +369,13 @@ public class Alien extends Application {
         root.getChildren().add(fondoPantallaView1);
         root.getChildren().add(fondoPantallaView2);
         root.getChildren().add(grupoNaveTitan);
+        root.getChildren().add(grupoNaveBlue);
         root.getChildren().add(nave);
         root.getChildren().add(grupoDisparoLazer);
         //root.getChildren().add(sonidoLazer);
         root.getChildren().add(panePuntuacion);
-        //root.getChildren().add(ZonaContactoDisparoLazer);
+        //root.getChildren().add(naveBlueView);
+        
         
         
         
@@ -393,6 +430,17 @@ public class Alien extends Application {
                     posicionYNaveTitan = -250;
                 }
                 
+                //Movimiento nave Blue
+                grupoNaveBlue.setLayoutY(posicionYNaveBlue);
+                posicionYNaveBlue+= 1;
+                grupoNaveBlue.setLayoutX(posicionXNaveBlue);
+                //Posición aleatoria nave Blue
+                if (posicionYNaveBlue > ALTO_PANTALLA) {
+                    posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+                    System.out.println(posicionXNaveBlue);
+                    posicionXNaveBlue = -250;
+                }
+                
                 //Posición disparo lazer
                 if (dispararLazer == false) {
                 posicionXDisparoLazer = posicionNaveX - 171;
@@ -431,8 +479,8 @@ public class Alien extends Application {
                 //Variable para saber si hay colición
                 boolean colisionGrupoDisparoLazerGrupoNaveTitan = shapeColisionGrupoDisparoLazerGrupoNaveTitan.getBoundsInLocal().isEmpty();
                 //Sentencia para saber si colicionan la nave y la nave Titan
-                if (colisionGrupoDisparoLazerGrupoNaveTitan == false) {
-                    //Perdida de vidas
+                if ((colisionGrupoDisparoLazerGrupoNaveTitan == false) && (colisionNaveGrupoNaveTitan == true)) {
+                    //Perdida de vidas               
                     puntos ++;
                     textoPuntuacion.setText(String.valueOf(puntos));
                     posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
