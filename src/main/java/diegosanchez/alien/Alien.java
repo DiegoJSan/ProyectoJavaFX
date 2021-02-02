@@ -49,42 +49,69 @@ public class Alien extends Application {
     float posicionXFondo2 = 0;
     float posicionYFondo2 = -700;
     float velocidadFondo = 0.5f;
+    
     //Variable para posición de nave
     int posicionNaveX = 450;
     int posicionNaveY = 550;  
+    
     //Variable para velocidad de movimiento de la nave
     int velocidadNaveX = 0;
     int velocidadNaveY = 0;
+    int VelocidadNaveIzquierda = -5;
+    int VelocidadNaveDerecha = 5;
+    int VelocidadNaveArriba = -5;
+    int VelocidadNaveAbajo = 5;
+    
     //Variable para posocion nave Titan
     int posicionYNaveTitan = -250;
     Random randomPosicionXNaveTitan = new Random();
         int posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+        
+    //Variable Velocidad Nave Blue
+    float velocidadNaveTitan = 1;
+    
     //Variable para posocion nave Blue
     int posicionYNaveBlue = -250;
     Random randomPosicionXNaveBlue = new Random();
         int posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+        
+    //Variable Velocidad Nave Blue
+    float velocidadNaveBlue = 2;
+    
     //Variable para posocion Asteroide1
     int posicionYAsteroide1 = -250;
     Random randomPosicionXAsteroide1 = new Random();
         int posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA);
+    Group NaveTitan;
+        
+    //Variable Velocidad Asteroide1
+    int velocidadXAsteroide1 = 1;
+    int velocidadYAsteroide1 = 3;
+       
     //Variable para posicion de disparo lazer
     int posicionXDisparoLazer;
     int posicionYDisparoLazer;
+    
     //Variable para disparar
     boolean dispararLazer = false;
     int estadoEspacio = 0;
     int ultimoEstadoEspacio = 0;
     int estadoDisparo;
     int velocidadLazer = 0;
-    boolean retornoLazer;
+    boolean retornoLazer = true;
+    boolean destruyeNave;
 
     //Variables y Constante para puntuación
     final int TAMAÑO_LETRAS = 24;
     Text textoPuntuacion;
     int vidas = 3;
     int puntos = 0;
-    //Variable para coliciones
-    //boolean colisionGrupoDisparoLazerGrupoNaveTitan;
+    int puntoMaximos = 0;
+    Text textoNumeroVidas;
+
+    //Variable para el sonido lazer
+    AudioClip sonidoLazer;
+   
    
 
     @Override
@@ -343,11 +370,10 @@ public class Alien extends Application {
         grupoDisparoLazer.setScaleY(0.25); 
         
         //Sonido disparo lazer //   
-        URL urlAudio = getClass().getResource("/sonidos/SHOOT013.mp3.mp3");
+        URL urlAudio = getClass().getResource("/sonidos/SHOOT013.mp3");
         if(urlAudio != null) {
             try {
-                AudioClip sonidoLazer = new AudioClip(urlAudio.toURI().toString());
-                sonidoLazer.play();
+                sonidoLazer = new AudioClip(urlAudio.toURI().toString());
             } catch (URISyntaxException ex) {
                 System.out.println("Error en el formato de ruta de archivo de audio");
             }            
@@ -473,12 +499,11 @@ public class Alien extends Application {
                 }
                 //Movimiento naveTitan
                 grupoNaveTitan.setLayoutY(posicionYNaveTitan);
-                posicionYNaveTitan+= 1;
+                posicionYNaveTitan+= velocidadNaveTitan;
                 grupoNaveTitan.setLayoutX(posicionXNaveTitan);
                 //Posición aleatoria nave Titan
                 if (posicionYNaveTitan > ALTO_PANTALLA) {
                     posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
-                    System.out.println(posicionXNaveTitan);
                     posicionYNaveTitan = -250;
                     puntos --;
                     textoPuntuacion.setText(String.valueOf(puntos));
@@ -486,13 +511,11 @@ public class Alien extends Application {
                 
                 //Movimiento nave Blue
                 grupoNaveBlue.setLayoutY(posicionYNaveBlue);
-                posicionYNaveBlue+= 1;
+                posicionYNaveBlue+= velocidadNaveBlue;
                 grupoNaveBlue.setLayoutX(posicionXNaveBlue);
                 //Posición aleatoria nave Blue
                 if (posicionYNaveBlue > ALTO_PANTALLA) {
                     posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
-                    System.out.print('P');
-                    System.out.println(posicionXNaveBlue);
                     posicionYNaveBlue = -250;
                     puntos --;
                     textoPuntuacion.setText(String.valueOf(puntos));
@@ -500,13 +523,12 @@ public class Alien extends Application {
                 
                 //Movimiento Asteroide1
                 grupoAsteroide1.setLayoutY(posicionYAsteroide1);
-                posicionYAsteroide1 += 3;
+                posicionYAsteroide1 += velocidadYAsteroide1;
                 grupoAsteroide1.setLayoutX(posicionXAsteroide1);
-                posicionXAsteroide1 -= 1;
+                posicionXAsteroide1 -= velocidadXAsteroide1;
                 //Posición aleatoria Asteroide1
                 if (posicionYAsteroide1 > ALTO_PANTALLA) {
                     posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA + 200);
-                    System.out.println(posicionXAsteroide1);
                     posicionYAsteroide1 = -250;
                 }
                 
@@ -520,7 +542,6 @@ public class Alien extends Application {
                     vidas--;
                     textoNumeroVidas.setText(String.valueOf(vidas));
                     posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
-                    System.out.println(posicionXNaveTitan);
                     posicionYNaveTitan = -250;
                     
                 }
@@ -535,7 +556,6 @@ public class Alien extends Application {
                     vidas--;
                     textoNumeroVidas.setText(String.valueOf(vidas));
                     posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
-                    System.out.println(posicionXNaveBlue);
                     posicionYNaveBlue = -250;
                     
                 }
@@ -550,7 +570,6 @@ public class Alien extends Application {
                     vidas--;
                     textoNumeroVidas.setText(String.valueOf(vidas));
                     posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA + 150);
-                    System.out.println(posicionXAsteroide1);
                     posicionYAsteroide1 = -250;
                     
                 }
@@ -566,9 +585,8 @@ public class Alien extends Application {
                     puntos ++;
                     textoPuntuacion.setText(String.valueOf(puntos));
                     posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
-                    System.out.println(posicionXNaveTitan);
                     posicionYNaveTitan = -250;
-                    
+                    destruyeNave = true;
                 }
                 
                 //Sentencia para comprobar si hay colición entre disparo lazer y nave Blue
@@ -582,9 +600,8 @@ public class Alien extends Application {
                     puntos ++;
                     textoPuntuacion.setText(String.valueOf(puntos));
                     posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
-                    System.out.println(posicionXNaveBlue);
                     posicionYNaveBlue = -250;
-                    
+                    destruyeNave = true;
                 }
                 
                 //Sentencia para comprobar si hay colición entre disparo lazer y Asteroide1
@@ -596,11 +613,7 @@ public class Alien extends Application {
                     
                     retornoLazer = true;
                 }
-                //Posición disparo lazer
-                /*if (dispararLazer == false) {
-                posicionXDisparoLazer = posicionNaveX - 171;
-                posicionYDisparoLazer = posicionNaveY - 108;
-                }*/
+                
                 //Posición disparo lazer
                 grupoDisparoLazer.setLayoutX(posicionXDisparoLazer);                
                 grupoDisparoLazer.setLayoutY(posicionYDisparoLazer);
@@ -608,6 +621,7 @@ public class Alien extends Application {
                 //Disparar con espacio
                 if (dispararLazer == true) {                
                     estadoEspacio = 1;
+                    sonidoLazer.play();
                 }
                 
                 if ((estadoEspacio == 1) && (ultimoEstadoEspacio == 0)){
@@ -630,33 +644,90 @@ public class Alien extends Application {
                     estadoDisparo = 0;
                     retornoLazer = false;
                 }
-            }) 
-        );
+                if ((estadoDisparo == 1) && (posicionYDisparoLazer == (posicionYDisparoLazer - 1))){
+                    sonidoLazer.play();
+                } 
+                
+               //Aumento de velocidad por marcador
+                if (puntos == 5) {
+                    velocidadNaveTitan = 2.5f;
+                    velocidadNaveBlue = 3.5f;
+                }             
+                if (puntos == 15) {
+                    velocidadXAsteroide1 = 2;
+                    velocidadYAsteroide1 = 4;
+                    VelocidadNaveIzquierda = -7;
+                    VelocidadNaveDerecha = 7;
+                    VelocidadNaveArriba = -7;
+                    VelocidadNaveAbajo = 7;           
+                }
+                if (puntos == 20) {
+                    velocidadNaveTitan = 3f;
+                    velocidadNaveBlue = 4f;
+                }
+                if (puntos == 25) {
+                    velocidadXAsteroide1 = 3;
+                    velocidadYAsteroide1 = 5;
+                    VelocidadNaveIzquierda = -9;
+                    VelocidadNaveDerecha = 9;
+                    VelocidadNaveArriba = -9;
+                    VelocidadNaveAbajo = 9;           
+                }
+                if (puntos == 30) {
+                    velocidadNaveTitan = 3.5f;
+                    velocidadNaveBlue = 4.5f;
+                }
+                if (puntos == 35) {
+                    velocidadXAsteroide1 = 3;
+                    velocidadYAsteroide1 = 5;
+                    VelocidadNaveIzquierda = -10;
+                    VelocidadNaveDerecha = 10;
+                    VelocidadNaveArriba = -10;
+                    VelocidadNaveAbajo = 10;           
+                }
+                if (puntos == 40) {
+                    velocidadNaveTitan = 5f;
+                    velocidadNaveBlue = 7f;
+                }
+                
+                //Actualizacion de máximo de puntos
+                if (puntos > puntoMaximos) {
+                        //Cambiar la nueva puntuación
+                        puntoMaximos = puntos;
+                        textoPuntuacionMax.setText(String.valueOf(puntoMaximos));
+                }
+                //Reiniciar partida si pierdes las vidas
+                if (vidas <=0){
+                    resetGame();
+                }                
+            })
+        ); //Final timeLine 
         movimiento.setCycleCount (Timeline.INDEFINITE);
         movimiento.play();
+        
         
         //Detección de las pulsaciones de las teclas
         escena.setOnKeyPressed((KeyEvent event) -> {
             switch(event.getCode()) {
                 case LEFT:
                     //Pulsada tecla izquierda
-                    velocidadNaveX = -5;
+                    velocidadNaveX = VelocidadNaveIzquierda;
                     break;
                 case RIGHT:
                     //Pulsada tecla derecha
-                    velocidadNaveX = 5;
+                    velocidadNaveX = VelocidadNaveDerecha;
                     break;
                 case UP:
                     //Pulsada tecla arriba
-                    velocidadNaveY = -5;
+                    velocidadNaveY = VelocidadNaveArriba;
                     break;
                 case DOWN:
                     //Pulsada tecla abajo
-                    velocidadNaveY = 5;
+                    velocidadNaveY = VelocidadNaveAbajo;
                     break;
                 case SPACE:
-                    //Pulsada tecla espacio
-                    dispararLazer = true; 
+                    //Pulsada tecla espacio                    
+                    dispararLazer = true;                    
                     break;
             }
         });
@@ -688,6 +759,38 @@ public class Alien extends Application {
         });
         
     }
+    
+    //Método para reiniciar el juego
+    private void resetGame() {
+        //Reinicio puntos
+        puntos = 0;
+        textoPuntuacion.setText(String.valueOf(puntos));
+        //Reinicio Vidas
+        vidas = 3;
+        textoNumeroVidas.setText(String.valueOf(vidas));
+        //Reinicio posicion  y  velocidad Nave
+        posicionNaveX = 450;
+        posicionNaveY = 550;
+        VelocidadNaveIzquierda = -5;
+        VelocidadNaveDerecha = 5;
+        VelocidadNaveArriba = -5;
+        VelocidadNaveAbajo = 5; 
+        //Reinicio velocidades Titan, Blue y Asteroide1
+        velocidadNaveTitan = 1;
+        velocidadNaveBlue = 2;
+        velocidadXAsteroide1 = 1;
+        velocidadYAsteroide1 = 3;
+        //Reinicio posicion Titan, Blue y Asteroide1
+        posicionYNaveTitan = -250;
+        posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+        grupoNaveTitan.setLayoutY(posicionYNaveTitan);
+        grupoNaveTitan.setLayoutX(posicionXNaveTitan);
+        posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+        posicionYNaveBlue = -250;
+        posicionYAsteroide1 = -250;
+        posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA);
+    }
+    
     public static void main(String[] args) {
         launch();
     }
