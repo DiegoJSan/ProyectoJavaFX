@@ -66,6 +66,7 @@ public class Alien extends Application {
     int posicionYNaveTitan = -250;
     Random randomPosicionXNaveTitan = new Random();
         int posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+    Group grupoNaveTitan;
         
     //Variable Velocidad Nave Blue
     float velocidadNaveTitan = 1;
@@ -74,6 +75,7 @@ public class Alien extends Application {
     int posicionYNaveBlue = -250;
     Random randomPosicionXNaveBlue = new Random();
         int posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+    Group grupoNaveBlue;
         
     //Variable Velocidad Nave Blue
     float velocidadNaveBlue = 2;
@@ -82,7 +84,8 @@ public class Alien extends Application {
     int posicionYAsteroide1 = -250;
     Random randomPosicionXAsteroide1 = new Random();
         int posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA);
-    Group NaveTitan;
+    Group grupoAsteroide1;
+
         
     //Variable Velocidad Asteroide1
     int velocidadXAsteroide1 = 1;
@@ -275,7 +278,7 @@ public class Alien extends Application {
         zonaContactoTitan.setLayoutX(140);
         
         //Agrupar imagen y objetos de la nave Titan
-        Group grupoNaveTitan = new Group();
+        grupoNaveTitan = new Group();
         grupoNaveTitan.getChildren().add(zonaContactoTitan);
         grupoNaveTitan.getChildren().add(naveTitanView);
         
@@ -315,7 +318,7 @@ public class Alien extends Application {
         zonaContactoBlue.setLayoutY(0);
         
         //Agrupar imagen y objetos de la nave Blue
-        Group grupoNaveBlue = new Group();
+        grupoNaveBlue = new Group();
         grupoNaveBlue.getChildren().add(zonaContactoBlue);
         grupoNaveBlue.getChildren().add(naveBlueView);
         
@@ -348,7 +351,7 @@ public class Alien extends Application {
         zonaContactoAsteroide1.setLayoutY(0);
         
         //Agrupar imagen y objetos de Asteroide1
-        Group grupoAsteroide1 = new Group();
+        grupoAsteroide1 = new Group();
         grupoAsteroide1.getChildren().add(zonaContactoAsteroide1);
         grupoAsteroide1.getChildren().add(Asteroide1View);
         
@@ -430,7 +433,7 @@ public class Alien extends Application {
         textoVidas.setFill(Color.RED);
         
         //Texto para Vida
-        Text textoNumeroVidas = new Text("3");
+        textoNumeroVidas = new Text("3");
         textoNumeroVidas.setFont(Font.font(TAMAÑO_LETRAS));
         textoNumeroVidas.setFill(Color.WHITE);
         
@@ -729,6 +732,10 @@ public class Alien extends Application {
                     //Pulsada tecla espacio                    
                     dispararLazer = true;                    
                     break;
+                case ENTER:
+                    //Pulsada tecla enter                    
+                    resetGame();                   
+                    break;
             }
         });
         //Detección de dejar de pulsar las teclas
@@ -783,12 +790,11 @@ public class Alien extends Application {
         //Reinicio posicion Titan, Blue y Asteroide1
         posicionYNaveTitan = -250;
         posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
-        grupoNaveTitan.setLayoutY(posicionYNaveTitan);
-        grupoNaveTitan.setLayoutX(posicionXNaveTitan);
         posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
-        posicionYNaveBlue = -250;
+        posicionYNaveBlue = -250;       
         posicionYAsteroide1 = -250;
         posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA);
+       
     }
     
     public static void main(String[] args) {
