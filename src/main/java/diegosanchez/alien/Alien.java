@@ -238,11 +238,6 @@ public class Alien extends Application {
         nave.getChildren().add(circuloAlaIqz);
         nave.getChildren().add(circuloAlaDcha);
         
-        
-        //Posicionar la nave
-        //nave.setLayoutX(0);
-        //nave.setLayoutY(0);
-
         //Escalar la nave
         nave.setScaleX(0.4);
         nave.setScaleY(0.4);
@@ -691,6 +686,19 @@ public class Alien extends Application {
                 if (puntos == 40) {
                     velocidadNaveTitan = 5f;
                     velocidadNaveBlue = 7f;
+                }
+                if (puntos == 45) {
+                    velocidadXAsteroide1 = 4;
+                    velocidadYAsteroide1 = 5;
+                    VelocidadNaveIzquierda = -11;
+                    VelocidadNaveDerecha = 11;
+                    VelocidadNaveArriba = -11;
+                    VelocidadNaveAbajo = 11;           
+                }
+                if (puntos == 50) {
+                    velocidadNaveTitan = 5.5f;
+                    velocidadNaveBlue = 7.5f;
+                    vidas += 1;
                 }
                 
                 //Actualizacion de máximo de puntos
