@@ -135,6 +135,8 @@ public class Alien extends Application {
     //Variable para sonidos
     AudioClip sonidoLazer;
     AudioClip sonidoExplosionNaves;
+    AudioClip sonidoExplosionAsteroides;
+    AudioClip sonidoExplosionGameOver;
     
     //Variable para el Timeline
     Timeline movimiento;
@@ -448,7 +450,9 @@ public class Alien extends Application {
         grupoAsteroide2.setScaleX(0.15);
         grupoAsteroide2.setScaleY(0.15);
         
-        
+        //Imagen explosion game over
+        var imagenExplosionGameOver = new Image(getClass().getResourceAsStream("/images/explosionGameOver.png"));
+        ImageView imagenExplosionGameOverView = new ImageView(imagenExplosionGameOver);
                 
         //Imagen disparo lazer
         var disparoLazer = new Image(getClass().getResourceAsStream("/images/DisparoLaser.png"));
@@ -475,11 +479,35 @@ public class Alien extends Application {
         System.out.println("No se ha encontrado el archivo de audio");
         }
         
-        //Sonido dexplosión naves enemigas //   
+        //Sonido de explosión naves enemigas //   
         URL urlExplosionNaves = getClass().getResource("/sonidos/explosion_Naves.mp3");
         if(urlExplosionNaves != null) {
             try {
                 sonidoExplosionNaves = new AudioClip(urlExplosionNaves.toURI().toString());
+            } catch (URISyntaxException ex) {
+                System.out.println("Error en el formato de ruta de archivo de audio");
+            }            
+        } else {
+        System.out.println("No se ha encontrado el archivo de audio");
+        }
+        
+        //Sonido de explosión asteroides //   
+        URL urlExplosionAsteroides = getClass().getResource("/sonidos/explosion_asteroides.mp3");
+        if(urlExplosionAsteroides != null) {
+            try {
+                sonidoExplosionAsteroides = new AudioClip(urlExplosionAsteroides.toURI().toString());
+            } catch (URISyntaxException ex) {
+                System.out.println("Error en el formato de ruta de archivo de audio");
+            }            
+        } else {
+        System.out.println("No se ha encontrado el archivo de audio");
+        }
+        
+        //Sonido de explosión game over //   
+        URL urlExplosionGameOver = getClass().getResource("/sonidos/explosion1GameOver.mp3");
+        if(urlExplosionGameOver != null) {
+            try {
+                sonidoExplosionGameOver = new AudioClip(urlExplosionGameOver.toURI().toString());
             } catch (URISyntaxException ex) {
                 System.out.println("Error en el formato de ruta de archivo de audio");
             }            
@@ -806,7 +834,7 @@ public class Alien extends Application {
                 boolean colisionGrupoDisparoLazerGrupoAsteroide1 = shapeColisionGrupoDisparoLazerGrupoAsteroide1.getBoundsInLocal().isEmpty();
                 //Sentencia para saber si colicionan lazer y Asteroide1
                 if ((colisionGrupoDisparoLazerGrupoAsteroide1 == false) && (colisionNaveGrupoAsteroide1 == true)) {
-                    
+                    sonidoExplosionAsteroides.play();
                     retornoLazer = true;
                 }
                 
@@ -816,7 +844,7 @@ public class Alien extends Application {
                 boolean colisionGrupoDisparoLazerGrupoAsteroide2 = shapeColisionGrupoDisparoLazerGrupoAsteroide2.getBoundsInLocal().isEmpty();
                 //Sentencia para saber si colicionan lazer y Asteroide1
                 if ((colisionGrupoDisparoLazerGrupoAsteroide2 == false) && (colisionNaveGrupoAsteroide2 == true)) {
-                    
+                    sonidoExplosionAsteroides.play();
                     retornoLazer = true;
                 }
                 
@@ -939,6 +967,8 @@ public class Alien extends Application {
                 //Reiniciar partida si pierdes las vidas
                 if ((vidas <=0) || (puntos < -50)){
                     //root.getChildren().add(etiquetaGameOver);
+                    root.getChildren().add(imagenExplosionGameOverView);
+                    sonidoExplosionGameOver.play();
                     root.getChildren().add(imagenGameOverView);
                     movimiento.stop();
                 }                
