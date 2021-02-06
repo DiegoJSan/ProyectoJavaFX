@@ -86,11 +86,20 @@ public class Alien extends Application {
     Random randomPosicionXAsteroide1 = new Random();
         int posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA);
     Group grupoAsteroide1;
-
+    
+    //Variable para posocion Asteroide2
+    int posicionXAsteroide2 = -700;
+    Random randomPosicionYAsteroide2 = new Random();
+        int posicionYAsteroide2 = randomPosicionYAsteroide2.nextInt(300)*-1;
+    Group grupoAsteroide2;
         
     //Variable Velocidad Asteroide1
     int velocidadXAsteroide1 = 1;
     int velocidadYAsteroide1 = 3;
+    
+    //Variable Velocidad Asteroide2
+    int velocidadXAsteroide2 = -4;
+    int velocidadYAsteroide2 = 2;
        
     //Variable para posicion de disparo lazer
     int posicionXDisparoLazer;
@@ -286,6 +295,7 @@ public class Alien extends Application {
         //Escalar nave Titan
         grupoNaveTitan.setScaleX(0.3);
         grupoNaveTitan.setScaleY(0.3);
+        
         //Rotar nave Titan
         grupoNaveTitan.setRotate(180);
         
@@ -359,6 +369,41 @@ public class Alien extends Application {
         //Escalar Asteroide 1
         grupoAsteroide1.setScaleX(0.15);
         grupoAsteroide1.setScaleY(0.15);
+        
+        //Imagen nave Asteroide2
+        var asteroide2 = new Image(getClass().getResourceAsStream("/images/Asteroide_2.png"));
+        ImageView Asteroide2View = new ImageView(asteroide2);
+        
+        //Zona de contacto Asteroide2
+        Polyline zonaContactoAsteroide2 = new Polyline();
+        zonaContactoAsteroide2.getPoints().addAll(new Double[]{
+            0.0, 0.0,
+            -150.0, 53.0,
+            -240.0, 270.0 ,
+            -160.0,440.0,
+            -5.0, 475.0,
+            120.0, 460.0,
+            260.0, 290.0,
+            190.0, 120.0,
+            110.0, 95.0,
+            60.0, 5.0,
+            0.0, 0.0,
+        });
+        zonaContactoAsteroide2.setFill(Color.YELLOW);
+        zonaContactoAsteroide2.setVisible(false);
+        zonaContactoAsteroide2.setLayoutX(240);
+        zonaContactoAsteroide2.setLayoutY(0);
+        
+        //Agrupar imagen y objetos de Asteroide2
+        grupoAsteroide2 = new Group();
+        grupoAsteroide2.getChildren().add(zonaContactoAsteroide2);
+        grupoAsteroide2.getChildren().add(Asteroide2View);
+        
+        //Escalar Asteroide 2
+        grupoAsteroide2.setScaleX(0.15);
+        grupoAsteroide2.setScaleY(0.15);
+        
+        
                 
         //Imagen disparo lazer
         var disparoLazer = new Image(getClass().getResourceAsStream("/images/DisparoLaser.png"));
@@ -446,13 +491,22 @@ public class Alien extends Application {
         paneVidas.getChildren().add(textoVidas);
         paneVidas.getChildren().add(textoNumeroVidas);
         
-        Label gameOver = new Label("Game Over");
-        gameOver.setFont(Font.font(130));
-        gameOver.setTextFill(Color.RED);
+        //Imagen Game Over 
+        var imagenGameOver = new Image(getClass().getResourceAsStream("/images/GameOver.png"));
+        ImageView imagenGameOverView = new ImageView(imagenGameOver);
         
-        gameOver.setMinWidth(ANCHO_PANTALLA); 
-        gameOver.setMinHeight(ALTO_PANTALLA);
-        gameOver.setAlignment(Pos.CENTER);
+        //Posicionar imagen Game Over
+        imagenGameOverView.setLayoutX(ANCHO_PANTALLA/2 - 258);
+        imagenGameOverView.setLayoutY(ALTO_PANTALLA/2 - 62);
+        
+        //Etiqueta para fin de partida
+        Label etiquetaGameOver = new Label("Game Over");
+        etiquetaGameOver.setFont(Font.font(130));
+        etiquetaGameOver.setTextFill(Color.RED);
+        
+        etiquetaGameOver.setMinWidth(ANCHO_PANTALLA); 
+        etiquetaGameOver.setMinHeight(ALTO_PANTALLA);
+        etiquetaGameOver.setAlignment(Pos.CENTER);
         
         //Añadir al contenedor
         root.getChildren().add(fondoPantallaView1);
@@ -462,7 +516,10 @@ public class Alien extends Application {
         root.getChildren().add(grupoAsteroide1);
         root.getChildren().add(grupoDisparoLazer);
         root.getChildren().add(nave);
+        root.getChildren().add(grupoAsteroide2);
         root.getChildren().add(panePuntuacion);
+        root.getChildren().add(imagenGameOverView);
+        
         
         
         
@@ -473,7 +530,7 @@ public class Alien extends Application {
         movimiento = new Timeline(
             //Movimiento del fondo comprobando que ha llegado al final de la pantalla
             new KeyFrame(Duration.seconds(0.017),(var ae) -> {
-                root.getChildren().remove(gameOver);
+                root.getChildren().remove(imagenGameOverView);
                 fondoPantallaView1.setLayoutY(posicionYFondo1);
                 posicionYFondo1+= velocidadFondo;
                 fondoPantallaView2.setLayoutY(posicionYFondo2);
@@ -545,6 +602,19 @@ public class Alien extends Application {
                     posicionYAsteroide1 = -250;
                 }
                 
+                //Movimiento Asteroide2
+                grupoAsteroide2.setLayoutY(posicionYAsteroide2);
+                posicionYAsteroide2 += velocidadYAsteroide2;
+                grupoAsteroide2.setLayoutX(posicionXAsteroide2);
+                posicionXAsteroide2 -= velocidadXAsteroide2;
+                
+                //Posición aleatoria Asteroide2
+                if (posicionXAsteroide2 > ANCHO_PANTALLA) {
+                    posicionYAsteroide2 = randomPosicionYAsteroide2.nextInt(300)*-1;
+                    System.out.println(posicionYAsteroide2);
+                    posicionXAsteroide2 = -700;
+                }
+                
                 //Sentencia para comprobar si hay colición entre nave y nave Titan
                 Shape shapeColisionNaveGrupoNaveTitan = Shape.intersect(zonaContactoNave, zonaContactoTitan);
                 //Variable para saber si hay colición
@@ -577,13 +647,27 @@ public class Alien extends Application {
                 Shape shapeColisionNaveGrupoAsteroide1 = Shape.intersect(zonaContactoNave, zonaContactoAsteroide1);
                 //Variable para saber si hay colición
                 boolean colisionNaveGrupoAsteroide1 = shapeColisionNaveGrupoAsteroide1.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan la nave y la nave Blue
+                //Sentencia para saber si colicionan la nave y Asteroide1
                 if (colisionNaveGrupoAsteroide1 == false) {
                     //Perdida de vidas
                     vidas--;
                     textoNumeroVidas.setText(String.valueOf(vidas));
                     posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA + 150);
                     posicionYAsteroide1 = -250;
+                    
+                }
+                
+                //Sentencia para comprobar si hay colición entre nave y Asteroide2
+                Shape shapeColisionNaveGrupoAsteroide2 = Shape.intersect(zonaContactoNave, zonaContactoAsteroide2);
+                //Variable para saber si hay colición
+                boolean colisionNaveGrupoAsteroide2 = shapeColisionNaveGrupoAsteroide2.getBoundsInLocal().isEmpty();
+                //Sentencia para saber si colicionan la nave y Asteroide2
+                if (colisionNaveGrupoAsteroide2 == false) {
+                    //Perdida de vidas
+                    vidas--;
+                    textoNumeroVidas.setText(String.valueOf(vidas));
+                    posicionYAsteroide2 = randomPosicionYAsteroide2.nextInt(300)*-1;
+                    posicionXAsteroide2 = -700;
                     
                 }
                 
@@ -625,6 +709,16 @@ public class Alien extends Application {
                 boolean colisionGrupoDisparoLazerGrupoAsteroide1 = shapeColisionGrupoDisparoLazerGrupoAsteroide1.getBoundsInLocal().isEmpty();
                 //Sentencia para saber si colicionan lazer y Asteroide1
                 if ((colisionGrupoDisparoLazerGrupoAsteroide1 == false) && (colisionNaveGrupoAsteroide1 == true)) {
+                    
+                    retornoLazer = true;
+                }
+                
+                //Sentencia para comprobar si hay colición entre disparo lazer y Asteroide2
+                Shape shapeColisionGrupoDisparoLazerGrupoAsteroide2 = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoAsteroide2);
+                //Variable para saber si hay colición
+                boolean colisionGrupoDisparoLazerGrupoAsteroide2 = shapeColisionGrupoDisparoLazerGrupoAsteroide2.getBoundsInLocal().isEmpty();
+                //Sentencia para saber si colicionan lazer y Asteroide1
+                if ((colisionGrupoDisparoLazerGrupoAsteroide2 == false) && (colisionNaveGrupoAsteroide2 == true)) {
                     
                     retornoLazer = true;
                 }
@@ -675,11 +769,12 @@ public class Alien extends Application {
                     VelocidadNaveDerecha = 7;
                     VelocidadNaveArriba = -7;
                     VelocidadNaveAbajo = 7;
-                    velocidadFondo = 1;
                 }
                 if (puntos == 20) {
                     velocidadNaveTitan = 3f;
                     velocidadNaveBlue = 4f;
+                    velocidadXAsteroide2 = -5;
+                    velocidadYAsteroide2 = 3;
                 }
                 if (puntos == 25) {
                     velocidadXAsteroide1 = 3;
@@ -687,8 +782,7 @@ public class Alien extends Application {
                     VelocidadNaveIzquierda = -9;
                     VelocidadNaveDerecha = 9;
                     VelocidadNaveArriba = -9;
-                    VelocidadNaveAbajo = 9; 
-                    velocidadFondo = 1.5f;
+                    VelocidadNaveAbajo = 9;
                 }
                 if (puntos == 30) {
                     velocidadNaveTitan = 3.5f;
@@ -700,8 +794,9 @@ public class Alien extends Application {
                     VelocidadNaveIzquierda = -10;
                     VelocidadNaveDerecha = 10;
                     VelocidadNaveArriba = -10;
-                    VelocidadNaveAbajo = 10; 
-                    velocidadFondo = 2;
+                    VelocidadNaveAbajo = 10;
+                    velocidadXAsteroide2 = -6;
+                    velocidadYAsteroide2 = 4;
                 }
                 if (puntos == 40) {
                     velocidadNaveTitan = 5f;
@@ -713,13 +808,14 @@ public class Alien extends Application {
                     VelocidadNaveIzquierda = -11;
                     VelocidadNaveDerecha = 11;
                     VelocidadNaveArriba = -11;
-                    VelocidadNaveAbajo = 11; 
-                    velocidadFondo = 2.5f;
+                    VelocidadNaveAbajo = 11;
                 }
                 if ((puntos >= 50) && (incrementoVidas == false)){
                     incrementoVidas = true;
                     velocidadNaveTitan = 5.5f;
                     velocidadNaveBlue = 7.5f;
+                    velocidadXAsteroide2 = -7;
+                    velocidadYAsteroide2 = 4;
                     vidas ++;
                     textoNumeroVidas.setText(String.valueOf(vidas));
                 }
@@ -732,7 +828,6 @@ public class Alien extends Application {
                     VelocidadNaveAbajo = 12;
                     velocidadNaveTitan = 6f;
                     velocidadNaveBlue = 8f;
-                    velocidadFondo = 3;
                 }
                 //Actualizacion de máximo de puntos
                 if (puntos > puntoMaximos) {
@@ -741,8 +836,9 @@ public class Alien extends Application {
                         textoPuntuacionMax.setText(String.valueOf(puntoMaximos));
                 }
                 //Reiniciar partida si pierdes las vidas
-                if ((vidas <=0) || (puntos < 0)){
-                    root.getChildren().add(gameOver);
+                if ((vidas <=0) || (puntos < -50)){
+                    //root.getChildren().add(etiquetaGameOver);
+                    root.getChildren().add(imagenGameOverView);
                     movimiento.stop();
                 }                
             })
@@ -826,18 +922,22 @@ public class Alien extends Application {
         VelocidadNaveDerecha = 5;
         VelocidadNaveArriba = -5;
         VelocidadNaveAbajo = 5; 
-        //Reinicio velocidades Titan, Blue y Asteroide1
+        //Reinicio velocidades Titan, Blue, Asteroide1 y Asteroide2
         velocidadNaveTitan = 1;
         velocidadNaveBlue = 2;
         velocidadXAsteroide1 = 1;
         velocidadYAsteroide1 = 3;
-        //Reinicio posicion Titan, Blue, Asteroide1 y Lazer
+        velocidadXAsteroide2 = -4;
+        velocidadYAsteroide2 = 2;
+        //Reinicio posicion Titan, Blue, Asteroide1, Asteroide2 y Lazer
         posicionYNaveTitan = -250;
         posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
         posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
         posicionYNaveBlue = -250;       
         posicionYAsteroide1 = -250;
         posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA);
+        posicionXAsteroide2 = -700;
+        posicionYAsteroide2 = randomPosicionYAsteroide2.nextInt(300)*-1;
         posicionXDisparoLazer = posicionNaveX - 171;
         posicionYDisparoLazer = posicionNaveY - 108;
         velocidadLazer = 0;
