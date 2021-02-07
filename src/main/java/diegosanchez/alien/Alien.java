@@ -61,7 +61,10 @@ public class Alien extends Application {
     int VelocidadNaveDerecha = 5;
     int VelocidadNaveArriba = -5;
     int VelocidadNaveAbajo = 5;
+    
+    //Variables Nave
     Group nave;
+    Polygon zonaContactoNave;
     
     //Variable para posocion Nave Titan
     int posicionYNaveTitan = -250;
@@ -72,6 +75,9 @@ public class Alien extends Application {
     //Variable Velocidad Nave Titan
     float velocidadNaveTitan = 1;
     
+    //Variables nave Titán
+    Polygon zonaContactoTitan;
+    
     //Variable para posocion Nave Blue
     int posicionYNaveBlue = -250;
     Random randomPosicionXNaveBlue = new Random();
@@ -80,6 +86,9 @@ public class Alien extends Application {
         
     //Variable Velocidad Nave Blue
     float velocidadNaveBlue = 2;
+    
+    //Variable Nave Blue
+    Polyline zonaContactoBlue;
     
     //Variable para posocion Nave Green
     int posicionYNaveGreen = -350;
@@ -146,11 +155,14 @@ public class Alien extends Application {
     Pane root;
     
     //Variables para las imagenes
+    ImageView fondoPantallaView1;
+    ImageView fondoPantallaView2;
     ImageView imagenExplosionGameOverView;
     ImageView imagenGameOverView;
 
     @Override
     public void start(Stage primeraEtapa) {
+        
         //Crear el contenedor para poner los objetos
         root = new Pane();
         
@@ -161,193 +173,18 @@ public class Alien extends Application {
         primeraEtapa.setScene(escena);
         primeraEtapa.show();
         
-        //Crear nave espacial
-        //Pico nave
-        Polygon picoNave = new Polygon(new double[]{
-            0.0, 0.0,
-            -20.0, 50.0,
-            20.0, 50.0 
-        });
-        picoNave.setFill(Color.WHITE);
-        //Cuerpo nave
-        Rectangle cuerpoNave = new Rectangle (-20,50,40,100);
-        cuerpoNave.setFill(Color.CRIMSON);
-        //Ala izquierda nave
-        Polygon alaIzqNave = new Polygon(new double[]{
-            -20.0, 70.0,
-            -80.0, 180.0,
-            -20.0, 150.0 
-        });
-        alaIzqNave.setFill(Color.WHITE);
-        //Ala derecha nave
-        Polygon alaDchaNave = new Polygon(new double[]{
-            20.0, 70.0,
-            20.0, 150.0,
-            80.0, 180.0 
-        });
-        alaDchaNave.setFill(Color.WHITE);
-        //Fuego nave 1
-        Polygon fuegoNave1 = new Polygon(new double[]{
-            0.0, 180.0,
-            -10.0, 150.0,
-            10.0, 150.0 
-        });
-        fuegoNave1.setFill(Color.YELLOW);
-        //Fuego nave 2
-        Polygon fuegoNave2 = new Polygon(new double[]{
-            0.0, 170.0,
-            -5.0, 150.0,
-            5.0, 150.0 
-        });
-        fuegoNave2.setFill(Color.RED);
-        //Ventana nave
-        Ellipse ventanaNave = new Ellipse(); {
-        ventanaNave.setCenterX(0);
-        ventanaNave.setCenterY(50);
-        ventanaNave.setRadiusX(8);
-        ventanaNave.setRadiusY(18);
-        }
-        ventanaNave.setFill(Color.CORNFLOWERBLUE);
-        //Linea nave1
-        Line lineaNave1 = new Line (-3, 75, -3, 145);
-        lineaNave1.setStroke(Color.WHITE);
-        lineaNave1.setStrokeWidth(2);
-        lineaNave1.setFill(Color.WHITE);
-        //Linea nave
-        Line lineaNave2 = new Line (3, 75, 3, 145);
-        lineaNave2.setStroke(Color.WHITE);
-        lineaNave2.setStrokeWidth(2);
-        lineaNave2.setFill(Color.WHITE);
-        //Punta ala izaquierda
-        Polygon puntaAlaIzq = new Polygon(new double[]{
-            -75, 140,
-            -80, 180,
-            -70, 175
-        });
-        puntaAlaIzq.setFill(Color.CRIMSON);
-        //Punta ala derecha
-        Polygon puntaAlaDcha = new Polygon(new double[]{
-            75, 140,
-            70, 175,
-            80, 180
-        });
-        puntaAlaDcha.setFill(Color.CRIMSON);
-        //Circulo ala iqz
-        Circle circuloAlaIqz = new Circle();
-        circuloAlaIqz.setCenterX(-38);
-        circuloAlaIqz.setCenterY(137);
-        circuloAlaIqz.setRadius(6);
-        circuloAlaIqz.setFill(Color.CRIMSON);
-        //Circulo ala derecha
-        Circle circuloAlaDcha = new Circle();
-        circuloAlaDcha.setCenterX(38);
-        circuloAlaDcha.setCenterY(137);
-        circuloAlaDcha.setRadius(6);
-        circuloAlaDcha.setFill(Color.CRIMSON);       
-        //Zona de contacto nave
-        Polygon zonaContactoNave = new Polygon(new double[]{
-            0.0, 15.0,
-            -75.0, 170.0,
-            75.0, 170.0 
-        }); 
-        zonaContactoNave.setFill(Color.YELLOW);
-        zonaContactoNave.setVisible(false);
+        //Llamada al método para crear nave
+        crearNave();
         
-        //Agrupar todos los objetos de la nave
-        nave = new Group();
-        nave.getChildren().add(zonaContactoNave);
-        nave.getChildren().add(picoNave);
-        nave.getChildren().add(cuerpoNave);
-        nave.getChildren().add(alaIzqNave);
-        nave.getChildren().add(alaDchaNave);
-        nave.getChildren().add(fuegoNave1);
-        nave.getChildren().add(fuegoNave2);
-        nave.getChildren().add(ventanaNave);
-        nave.getChildren().add(lineaNave1);
-        nave.getChildren().add(lineaNave2);
-        nave.getChildren().add(puntaAlaIzq);
-        nave.getChildren().add(puntaAlaDcha);
-        nave.getChildren().add(circuloAlaIqz);
-        nave.getChildren().add(circuloAlaDcha);
+        //Llamada al método para el fondo
+        crearFondo();
         
-        //Escalar la nave
-        nave.setScaleX(0.4);
-        nave.setScaleY(0.4);
+        //Llamada al método para nave Titán
+        crearNaveTitan();   
         
-        //Imegen 1 de pantalla
-        var fondoPantalla1 = new Image(getClass().getResourceAsStream("/images/FondoEstrellas1.png"));
-        ImageView fondoPantallaView1 = new ImageView(fondoPantalla1);
+        //Llamada al método para nave Titán
+        crearNaveBlue(); 
         
-        //Imegen 2 de pantalla
-        var fondoPantalla2 = new Image(getClass().getResourceAsStream("/images/FondoEstrellas2.png"));
-        ImageView fondoPantallaView2 = new ImageView(fondoPantalla2);
-        
-        //Posicionar imagen 1
-        fondoPantallaView1.setLayoutX(posicionXFondo1);
-        fondoPantallaView1.setLayoutY(posicionYFondo1);
-        
-        //Posicionar imagen 2
-        fondoPantallaView2.setLayoutX(posicionXFondo2);
-        fondoPantallaView2.setLayoutY(posicionYFondo2);
-        
-        //Imagen nave Titan
-        var naveTitan = new Image(getClass().getResourceAsStream("/images/Titan.png"));
-        ImageView naveTitanView = new ImageView(naveTitan);
-        
-        //Zona de contacto nave Titan
-        Polygon zonaContactoTitan = new Polygon(new double[]{
-            0.0, 0.0,
-            -140.0, 300.0,
-            140.0, 300.0 
-        }); 
-        zonaContactoTitan.setFill(Color.YELLOW);
-        zonaContactoTitan.setVisible(false);
-        zonaContactoTitan.setLayoutX(140);
-        
-        //Agrupar imagen y objetos de la nave Titan
-        grupoNaveTitan = new Group();
-        grupoNaveTitan.getChildren().add(zonaContactoTitan);
-        grupoNaveTitan.getChildren().add(naveTitanView);
-        
-        //Escalar nave Titan
-        grupoNaveTitan.setScaleX(0.3);
-        grupoNaveTitan.setScaleY(0.3);
-        
-        //Rotar nave Titan
-        grupoNaveTitan.setRotate(180);     
-        
-        //Imagen nave Blue
-        var naveBlue = new Image(getClass().getResourceAsStream("/images/Blue.png"));
-        ImageView naveBlueView = new ImageView(naveBlue);
-        
-        //Zona de contacto nave Blue
-        Polyline zonaContactoBlue = new Polyline();
-        zonaContactoBlue.getPoints().addAll(new Double[]{
-            0.0, 22.0,
-            -35.0, 75.0,
-            -40.0, 0.0 ,
-            -70.0, 75.0,
-            0.0, 110.0,
-            70.0, 75.0,
-            40.0, 0.0,
-            35.0, 75.0
-        });
-        zonaContactoBlue.setFill(Color.YELLOW);
-        zonaContactoBlue.setVisible(false);
-        zonaContactoBlue.setLayoutX(75);
-        zonaContactoBlue.setLayoutY(0);
-        
-        //Agrupar imagen y objetos de la nave Blue
-        grupoNaveBlue = new Group();
-        grupoNaveBlue.getChildren().add(zonaContactoBlue);
-        grupoNaveBlue.getChildren().add(naveBlueView);
-        
-        //Escalar nave Blue
-        grupoNaveBlue.setScaleX(0.6);
-        grupoNaveBlue.setScaleY(0.6);
-        
-        //Rotar nave Blue
-        grupoNaveBlue.setRotate(180);
         
         //Imagen nave Green
         var naveGreen = new Image(getClass().getResourceAsStream("/images/NaveGreen.png"));
@@ -612,7 +449,8 @@ public class Alien extends Application {
         root.getChildren().add(grupoDisparoLazer);
         root.getChildren().add(nave);
         root.getChildren().add(panePuntuacion);
-                                     
+        
+        
         //Animación
         movimiento = new Timeline(
             new KeyFrame(Duration.seconds(0.017),(var ae) -> {
@@ -906,7 +744,7 @@ public class Alien extends Application {
                 if (puntos == 5){                   
                     velocidadNaveTitan = 1.5f;
                     velocidadNaveBlue = 2.5f;
-                    velocidadNaveGreen = 2.0f;                  
+                    velocidadNaveGreen = 2.0f; 
                 }             
                 if (puntos == 15) {
                     velocidadXAsteroide1 = 2;
@@ -958,6 +796,7 @@ public class Alien extends Application {
                     VelocidadNaveDerecha = 11;
                     VelocidadNaveArriba = -11;
                     VelocidadNaveAbajo = 11;
+                    
                 }
                 if ((puntos == 50) && (incrementoVidas == false)){
                     incrementoVidas = true;
@@ -1065,6 +904,205 @@ public class Alien extends Application {
         
     }
     
+    //Método para crear nave
+    private void crearNave(){
+        //Crear nave espacial
+        //Pico nave
+        Polygon picoNave = new Polygon(new double[]{
+            0.0, 0.0,
+            -20.0, 50.0,
+            20.0, 50.0 
+        });
+        picoNave.setFill(Color.WHITE);
+        //Cuerpo nave
+        Rectangle cuerpoNave = new Rectangle (-20,50,40,100);
+        cuerpoNave.setFill(Color.CRIMSON);
+        //Ala izquierda nave
+        Polygon alaIzqNave = new Polygon(new double[]{
+            -20.0, 70.0,
+            -80.0, 180.0,
+            -20.0, 150.0 
+        });
+        alaIzqNave.setFill(Color.WHITE);
+        //Ala derecha nave
+        Polygon alaDchaNave = new Polygon(new double[]{
+            20.0, 70.0,
+            20.0, 150.0,
+            80.0, 180.0 
+        });
+        alaDchaNave.setFill(Color.WHITE);
+        //Fuego nave 1
+        Polygon fuegoNave1 = new Polygon(new double[]{
+            0.0, 180.0,
+            -10.0, 150.0,
+            10.0, 150.0 
+        });
+        fuegoNave1.setFill(Color.YELLOW);
+        //Fuego nave 2
+        Polygon fuegoNave2 = new Polygon(new double[]{
+            0.0, 170.0,
+            -5.0, 150.0,
+            5.0, 150.0 
+        });
+        fuegoNave2.setFill(Color.RED);
+        //Ventana nave
+        Ellipse ventanaNave = new Ellipse(); {
+        ventanaNave.setCenterX(0);
+        ventanaNave.setCenterY(50);
+        ventanaNave.setRadiusX(8);
+        ventanaNave.setRadiusY(18);
+        }
+        ventanaNave.setFill(Color.CORNFLOWERBLUE);
+        //Linea nave1
+        Line lineaNave1 = new Line (-3, 75, -3, 145);
+        lineaNave1.setStroke(Color.WHITE);
+        lineaNave1.setStrokeWidth(2);
+        lineaNave1.setFill(Color.WHITE);
+        //Linea nave
+        Line lineaNave2 = new Line (3, 75, 3, 145);
+        lineaNave2.setStroke(Color.WHITE);
+        lineaNave2.setStrokeWidth(2);
+        lineaNave2.setFill(Color.WHITE);
+        //Punta ala izaquierda
+        Polygon puntaAlaIzq = new Polygon(new double[]{
+            -75, 140,
+            -80, 180,
+            -70, 175
+        });
+        puntaAlaIzq.setFill(Color.CRIMSON);
+        //Punta ala derecha
+        Polygon puntaAlaDcha = new Polygon(new double[]{
+            75, 140,
+            70, 175,
+            80, 180
+        });
+        puntaAlaDcha.setFill(Color.CRIMSON);
+        //Circulo ala iqz
+        Circle circuloAlaIqz = new Circle();
+        circuloAlaIqz.setCenterX(-38);
+        circuloAlaIqz.setCenterY(137);
+        circuloAlaIqz.setRadius(6);
+        circuloAlaIqz.setFill(Color.CRIMSON);
+        //Circulo ala derecha
+        Circle circuloAlaDcha = new Circle();
+        circuloAlaDcha.setCenterX(38);
+        circuloAlaDcha.setCenterY(137);
+        circuloAlaDcha.setRadius(6);
+        circuloAlaDcha.setFill(Color.CRIMSON);       
+        //Zona de contacto nave
+        zonaContactoNave = new Polygon(new double[]{
+            0.0, 15.0,
+            -75.0, 170.0,
+            75.0, 170.0 
+        }); 
+        zonaContactoNave.setFill(Color.YELLOW);
+        zonaContactoNave.setVisible(false);
+        
+        //Agrupar todos los objetos de la nave
+        nave = new Group();
+        nave.getChildren().add(zonaContactoNave);
+        nave.getChildren().add(picoNave);
+        nave.getChildren().add(cuerpoNave);
+        nave.getChildren().add(alaIzqNave);
+        nave.getChildren().add(alaDchaNave);
+        nave.getChildren().add(fuegoNave1);
+        nave.getChildren().add(fuegoNave2);
+        nave.getChildren().add(ventanaNave);
+        nave.getChildren().add(lineaNave1);
+        nave.getChildren().add(lineaNave2);
+        nave.getChildren().add(puntaAlaIzq);
+        nave.getChildren().add(puntaAlaDcha);
+        nave.getChildren().add(circuloAlaIqz);
+        nave.getChildren().add(circuloAlaDcha);
+        
+        //Escalar la nave
+        nave.setScaleX(0.4);
+        nave.setScaleY(0.4);
+    }
+    
+    //Método para crear el fondo
+    private void crearFondo(){
+        //Imegen 1 de pantalla
+        var fondoPantalla1 = new Image(getClass().getResourceAsStream("/images/FondoEstrellas1.png"));
+        fondoPantallaView1 = new ImageView(fondoPantalla1);
+        
+        //Imegen 2 de pantalla
+        var fondoPantalla2 = new Image(getClass().getResourceAsStream("/images/FondoEstrellas2.png"));
+        fondoPantallaView2 = new ImageView(fondoPantalla2);
+        
+        //Posicionar imagen 1
+        fondoPantallaView1.setLayoutX(posicionXFondo1);
+        fondoPantallaView1.setLayoutY(posicionYFondo1);
+        
+        //Posicionar imagen 2
+        fondoPantallaView2.setLayoutX(posicionXFondo2);
+        fondoPantallaView2.setLayoutY(posicionYFondo2);
+    }
+    
+    //Método para crear nave Titán
+    private void crearNaveTitan(){
+        //Imagen nave Titan
+        var naveTitan = new Image(getClass().getResourceAsStream("/images/Titan.png"));
+        ImageView naveTitanView = new ImageView(naveTitan);
+        
+        //Zona de contacto nave Titán
+        zonaContactoTitan = new Polygon(new double[]{
+            0.0, 0.0,
+            -140.0, 300.0,
+            140.0, 300.0 
+        }); 
+        zonaContactoTitan.setFill(Color.YELLOW);
+        zonaContactoTitan.setVisible(false);
+        zonaContactoTitan.setLayoutX(140);
+        
+        //Agrupar imagen y objetos de la nave Titán
+        grupoNaveTitan = new Group();
+        grupoNaveTitan.getChildren().add(zonaContactoTitan);
+        grupoNaveTitan.getChildren().add(naveTitanView);
+        
+        //Escalar nave Titán
+        grupoNaveTitan.setScaleX(0.3);
+        grupoNaveTitan.setScaleY(0.3);
+        
+        //Rotar nave Titán
+        grupoNaveTitan.setRotate(180); 
+    }
+    
+    //Método para crear nave Blue
+    private void crearNaveBlue(){
+        //Imagen nave Blue
+        var naveBlue = new Image(getClass().getResourceAsStream("/images/Blue.png"));
+        ImageView naveBlueView = new ImageView(naveBlue);
+        
+        //Zona de contacto nave Blue
+        zonaContactoBlue = new Polyline();
+        zonaContactoBlue.getPoints().addAll(new Double[]{
+            0.0, 22.0,
+            -35.0, 75.0,
+            -40.0, 0.0 ,
+            -70.0, 75.0,
+            0.0, 110.0,
+            70.0, 75.0,
+            40.0, 0.0,
+            35.0, 75.0
+        });
+        zonaContactoBlue.setFill(Color.YELLOW);
+        zonaContactoBlue.setVisible(false);
+        zonaContactoBlue.setLayoutX(75);
+        zonaContactoBlue.setLayoutY(0);
+        
+        //Agrupar imagen y objetos de la nave Blue
+        grupoNaveBlue = new Group();
+        grupoNaveBlue.getChildren().add(zonaContactoBlue);
+        grupoNaveBlue.getChildren().add(naveBlueView);
+        
+        //Escalar nave Blue
+        grupoNaveBlue.setScaleX(0.6);
+        grupoNaveBlue.setScaleY(0.6);
+        
+        //Rotar nave Blue
+        grupoNaveBlue.setRotate(180);
+    }
     //Método para reiniciar el juego
     private void resetGame() {
         //Reiniciar Timeline
