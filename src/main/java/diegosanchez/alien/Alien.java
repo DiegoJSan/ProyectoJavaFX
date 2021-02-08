@@ -163,14 +163,26 @@ public class Alien extends Application {
     
     //Variable para la pantalla
     Pane root;
-    
-    
+    Scene escena;
+      
     //Variables para las imagenes
     ImageView fondoPantallaView1;
     ImageView fondoPantallaView2;
     ImageView imagenExplosionGameOverView;
     ImageView imagenGameOverView;
-    ImageView imagenExplosionGameOver;
+     
+    //Variables colisiones
+    boolean colisionNaveGrupoNaveTitan;
+    boolean colisionNaveGrupoNaveBlue;
+    boolean colisionNaveGrupoNaveGreen;
+    boolean colisionNaveGrupoAsteroide1;
+    boolean colisionNaveGrupoAsteroide2;
+    boolean colisionGrupoDisparoLazerGrupoNaveTitan;
+    boolean colisionGrupoDisparoLazerGrupoNaveBlue;
+    boolean colisionGrupoDisparoLazerGrupoNaveGreen;
+    boolean colisionGrupoDisparoLazerGrupoAsteroide1;
+    boolean colisionGrupoDisparoLazerGrupoAsteroide2;
+    
 
     @Override
     public void start(Stage primeraEtapa) {
@@ -179,7 +191,7 @@ public class Alien extends Application {
         root = new Pane();
         
         //Crear la escena(ventana)
-        Scene escena = new Scene(root, ANCHO_PANTALLA, ALTO_PANTALLA, Color.BLACK);
+        escena = new Scene(root, ANCHO_PANTALLA, ALTO_PANTALLA, Color.BLACK);
         primeraEtapa.setResizable(false);
         primeraEtapa.setTitle("Alien");
         primeraEtapa.setScene(escena);
@@ -200,7 +212,7 @@ public class Alien extends Application {
         //Llamada método para nave Green
         crearNaveGreen();
         
-        //Lamada al método para Asteroide1
+        //Llamada al método para Asteroide1
         crearAsteroide1();
         
         //Llamada al método para Asteroide2
@@ -227,26 +239,11 @@ public class Alien extends Application {
         //Llamada al método para crear marcadores
         marcadores();
         
+        //Llamada al método para imagen Game Over
+        imagenGameOver();
         
-        //Imagen Game Over 
-        var imagenGameOver = new Image(getClass().getResourceAsStream("/images/GameOver.png"));
-        imagenGameOverView = new ImageView(imagenGameOver);
-        
-        //Posicionar imagen Game Over
-        imagenGameOverView.setLayoutX(ANCHO_PANTALLA/2 - 258);
-        imagenGameOverView.setLayoutY(ALTO_PANTALLA/2 - 62);
-        
-        //Añadir al contenedor
-        root.getChildren().add(fondoPantallaView1);
-        root.getChildren().add(fondoPantallaView2);
-        root.getChildren().add(grupoNaveTitan);
-        root.getChildren().add(grupoNaveBlue);
-        root.getChildren().add(grupoNaveGreen);
-        root.getChildren().add(grupoAsteroide1);
-        root.getChildren().add(grupoAsteroide2);
-        root.getChildren().add(grupoDisparoLazer);
-        root.getChildren().add(nave);
-        root.getChildren().add(panePuntuacion);
+        //Llamada al método para agragar al contenedor
+        añadirContenedor();
         
         
         //Animación
@@ -254,457 +251,81 @@ public class Alien extends Application {
             new KeyFrame(Duration.seconds(0.017),(var ae) -> {
                 //mostrar variables
                 //System.out.println("Velocidad Titán: " + velocidadNaveTitan);
-                //Movimiento del fondo comprobando que ha llegado al final de la pantalla
-                fondoPantallaView1.setLayoutY(posicionYFondo1);
-                posicionYFondo1+= velocidadFondo;
-                fondoPantallaView2.setLayoutY(posicionYFondo2);
-                posicionYFondo2+= velocidadFondo;
-                if (posicionYFondo1 >= ALTO_PANTALLA) {
-                    posicionYFondo1 = -ALTO_PANTALLA;
-                }
-                if (posicionYFondo2 >= ALTO_PANTALLA) {
-                    posicionYFondo2 = -ALTO_PANTALLA;
-                }
-                //Actualizar posición X de la nave
-                posicionNaveX += velocidadNaveX;
-                nave.setTranslateX(posicionNaveX);
-                //Actualizar posición Y de la nave
-                posicionNaveY += velocidadNaveY;
-                nave.setTranslateY(posicionNaveY);               
                 
-                //Comprobar si se sale la nave por la izquierda
-                if (posicionNaveX < 50) {
-                    posicionNaveX = 50;
-                }else{
-                    //Comprobar que no se sale por la derecha
-                    if (posicionNaveX > ANCHO_PANTALLA -50) {
-                        posicionNaveX = ANCHO_PANTALLA -50;
-                    }
-                }
+                //Llamada al método para fondo en movimiento
+                moviminetoFondo();
                 
-                //Comprobar si se sale la nave por arriba
-                if (posicionNaveY < -30) {
-                    posicionNaveY = -30;
-                }else{
-                    //Comprobar que no se sale por abajo
-                    if (posicionNaveY > ALTO_PANTALLA -150) {
-                        posicionNaveY = ALTO_PANTALLA -150;
-                    }
-                }
-                //Movimiento nave Titan
-                grupoNaveTitan.setLayoutY(posicionYNaveTitan);
-                posicionYNaveTitan+= velocidadNaveTitan;
-                grupoNaveTitan.setLayoutX(posicionXNaveTitan);
-                //Posición aleatoria nave Titan
-                if (posicionYNaveTitan > ALTO_PANTALLA) {
-                    posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
-                    posicionYNaveTitan = -250;
-                    puntos --;
-                    textoPuntuacion.setText(String.valueOf(puntos));
-                }
+                //Llamada al método movimiento Nave
+                movimientoNave();
                 
-                //Movimiento nave Blue
-                grupoNaveBlue.setLayoutY(posicionYNaveBlue);
-                posicionYNaveBlue+= velocidadNaveBlue;
-                grupoNaveBlue.setLayoutX(posicionXNaveBlue);
+                //Llamada al método movimiento Nave Titán
+                movimientoNaveTitan();
                 
-                //Posición aleatoria nave Blue
-                if (posicionYNaveBlue > ALTO_PANTALLA) {
-                    posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
-                    posicionYNaveBlue = -250;
-                    puntos --;
-                    textoPuntuacion.setText(String.valueOf(puntos));
-                }
+                //Llamada al método movimiento Nave Blue
+                movimientoNaveBlue();
                 
-                //Movimiento nave Green
-                grupoNaveGreen.setLayoutY(posicionYNaveGreen);
-                posicionYNaveGreen+= velocidadNaveGreen;
-                grupoNaveGreen.setLayoutX(posicionXNaveGreen);
+                //Llamada al método movimiento Nave Green
+                movimientoNaveGreen();
                 
-                //Posición aleatoria nave Green
-                if (posicionYNaveGreen > ALTO_PANTALLA) {
-                    posicionXNaveGreen = randomPosicionXNaveGreen.nextInt(ANCHO_PANTALLA)- 150;
-                    System.out.println(posicionXNaveGreen);
-                    posicionYNaveGreen = -350;
-                    puntos --;
-                    textoPuntuacion.setText(String.valueOf(puntos));
-                }
+                //Llamada al método movimiento Asteroide1
+                movimientoAsteroide1();
                 
-                //Movimiento Asteroide1
-                grupoAsteroide1.setLayoutY(posicionYAsteroide1);
-                posicionYAsteroide1 += velocidadYAsteroide1;
-                grupoAsteroide1.setLayoutX(posicionXAsteroide1);
-                posicionXAsteroide1 -= velocidadXAsteroide1;
+                //Llamada al método movimiento Asteroide2
+                movimientoAsteroide2();
                 
-                //Posición aleatoria Asteroide1
-                if (posicionYAsteroide1 > ALTO_PANTALLA) {
-                    posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA + 200);
-                    posicionYAsteroide1 = -250;
-                }
+                //Llamada al método colision entre Nave y Nave Titán
+                colisionNaveNaveTitan();
                 
-                //Movimiento Asteroide2
-                grupoAsteroide2.setLayoutY(posicionYAsteroide2);
-                posicionYAsteroide2 += velocidadYAsteroide2;
-                grupoAsteroide2.setLayoutX(posicionXAsteroide2);
-                posicionXAsteroide2 -= velocidadXAsteroide2;
+                //Llamada al método colision entre Nave y Nave Blue
+                colisionNaveNaveBlue();
                 
-                //Posición aleatoria Asteroide2
-                if (posicionXAsteroide2 > ANCHO_PANTALLA) {
-                    posicionYAsteroide2 = randomPosicionYAsteroide2.nextInt(300)*-1;
-                    posicionXAsteroide2 = -700;
-                }
+                //Llamada al método colision entre Nave y Nave Green
+                colisionNaveNaveGreen();
                 
-                //Sentencia para comprobar si hay colición entre nave y nave Titan
-                Shape shapeColisionNaveGrupoNaveTitan = Shape.intersect(zonaContactoNave, zonaContactoTitan);
-                //Variable para saber si hay colición
-                boolean colisionNaveGrupoNaveTitan = shapeColisionNaveGrupoNaveTitan.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan la nave y la nave Titan
-                if (colisionNaveGrupoNaveTitan == false) {
-                    //Perdida de vidas
-                    vidas--;
-                    textoNumeroVidas.setText(String.valueOf(vidas));
-                    posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
-                    posicionYNaveTitan = -250;
-                    if (vidas != 0){
-                    sonidoChoqueNave.play();
-                    }
-                }
+                //Llamada al método colision entre Nave y Asteroide1
+                colisionNaveAsteroide1();
                 
-                //Sentencia para comprobar si hay colición entre nave y nave Blue
-                Shape shapeColisionNaveGrupoNaveBlue = Shape.intersect(zonaContactoNave, zonaContactoBlue);
-                //Variable para saber si hay colición
-                boolean colisionNaveGrupoNaveBlue = shapeColisionNaveGrupoNaveBlue.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan la nave y la nave Blue
-                if (colisionNaveGrupoNaveBlue == false) {
-                    //Perdida de vidas
-                    vidas--;
-                    textoNumeroVidas.setText(String.valueOf(vidas));
-                    posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
-                    posicionYNaveBlue = -250;  
-                    if (vidas != 0){
-                    sonidoChoqueNave.play();
-                    }
-                }
+                //Llamada al método colision entre Nave y Asteroide2
+                colisionNaveAsteroide2();
                 
-                //Sentencia para comprobar si hay colición entre nave y nave Green
-                Shape shapeColisionNaveGrupoNaveGreen = Shape.intersect(zonaContactoNave, zonaContactoGreen);
-                //Variable para saber si hay colición
-                boolean colisionNaveGrupoNaveGreen = shapeColisionNaveGrupoNaveGreen.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan la nave y la nave Green
-                if (colisionNaveGrupoNaveGreen == false) {
-                    //Perdida de vidas
-                    vidas--;
-                    textoNumeroVidas.setText(String.valueOf(vidas));
-                    posicionXNaveGreen = randomPosicionXNaveGreen.nextInt(ANCHO_PANTALLA)- 150;
-                    System.out.println(posicionXNaveGreen);
-                    posicionYNaveGreen = -350;  
-                    if (vidas != 0){
-                    sonidoChoqueNave.play();
-                    }
-                }
+                //Llamada al método colision entre Lazer y Nave Titán
+                colisionLazerNaveTitan();
                 
-                //Sentencia para comprobar si hay colición entre nave y Asteroide1
-                Shape shapeColisionNaveGrupoAsteroide1 = Shape.intersect(zonaContactoNave, zonaContactoAsteroide1);
-                //Variable para saber si hay colición
-                boolean colisionNaveGrupoAsteroide1 = shapeColisionNaveGrupoAsteroide1.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan la nave y Asteroide1
-                if (colisionNaveGrupoAsteroide1 == false) {
-                    //Perdida de vidas
-                    vidas--;
-                    textoNumeroVidas.setText(String.valueOf(vidas));
-                    posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA + 150);
-                    posicionYAsteroide1 = -250;
-                    if (vidas != 0){
-                    sonidoChoqueNave.play();
-                    } 
-                }
+                //Llamada al método colision entre Lazer y Nave Blue
+                colisionLazerNaveBlue();
                 
-                //Sentencia para comprobar si hay colición entre nave y Asteroide2
-                Shape shapeColisionNaveGrupoAsteroide2 = Shape.intersect(zonaContactoNave, zonaContactoAsteroide2);
-                //Variable para saber si hay colición
-                boolean colisionNaveGrupoAsteroide2 = shapeColisionNaveGrupoAsteroide2.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan la nave y Asteroide2
-                if (colisionNaveGrupoAsteroide2 == false) {
-                    //Perdida de vidas
-                    vidas--;
-                    textoNumeroVidas.setText(String.valueOf(vidas));
-                    posicionYAsteroide2 = randomPosicionYAsteroide2.nextInt(300)*-1;
-                    posicionXAsteroide2 = -700;
-                    if (vidas != 0){
-                    sonidoChoqueNave.play();
-                    }
-                }
+                //Llamada al método colision entre Lazer y Nave Green
+                colisionLazerNaveGreen();
                 
-                //Sentencia para comprobar si hay colición entre disparo lazer y nave Titan
-                Shape shapeColisionGrupoDisparoLazerGrupoNaveTitan = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoTitan);
-                //Variable para saber si hay colición
-                boolean colisionGrupoDisparoLazerGrupoNaveTitan = shapeColisionGrupoDisparoLazerGrupoNaveTitan.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan la nave y la nave Titan
-                if ((colisionGrupoDisparoLazerGrupoNaveTitan == false) && (colisionNaveGrupoNaveTitan == true)) {
-                    //Perdida de vidas 
-                    retornoLazer = true;
-                    puntos ++;
-                    incrementoVidas = false;
-                    textoPuntuacion.setText(String.valueOf(puntos));
-                    posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
-                    posicionYNaveTitan = -250;
-                    destruyeNave = true;
-                    sonidoExplosionNaves.play();
-                }
+                //Llamada al método colision entre Lazer y Asteroide1
+                colisionLazerAsteroide1(); 
                 
-                //Sentencia para comprobar si hay colición entre disparo lazer y nave Blue
-                Shape shapeColisionGrupoDisparoLazerGrupoNaveBlue = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoBlue);
-                //Variable para saber si hay colición
-                boolean colisionGrupoDisparoLazerGrupoNaveBlue = shapeColisionGrupoDisparoLazerGrupoNaveBlue.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan la nave y la nave Blue
-                if ((colisionGrupoDisparoLazerGrupoNaveBlue == false) && (colisionNaveGrupoNaveBlue == true)) {
-                    //Perdida de vidas 
-                    retornoLazer = true;
-                    puntos ++;
-                    incrementoVidas = false;
-                    textoPuntuacion.setText(String.valueOf(puntos));
-                    posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
-                    posicionYNaveBlue = -250;
-                    destruyeNave = true;
-                    sonidoExplosionNaves.play();
-                }
+                //Llamada al método colision entre Lazer y Asteroide2
+                colisionLazerAsteroide2(); 
                 
-                //Sentencia para comprobar si hay colición entre disparo lazer y nave Green
-                Shape shapeColisionGrupoDisparoLazerGrupoNaveGreen = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoGreen);
-                //Variable para saber si hay colición
-                boolean colisionGrupoDisparoLazerGrupoNaveGreen = shapeColisionGrupoDisparoLazerGrupoNaveGreen.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan la nave y la nave Green
-                if ((colisionGrupoDisparoLazerGrupoNaveGreen == false) && (colisionNaveGrupoNaveGreen == true)) {
-                    //Perdida de vidas 
-                    retornoLazer = true;
-                    puntos ++;
-                    incrementoVidas = false;
-                    textoPuntuacion.setText(String.valueOf(puntos));
-                    posicionXNaveGreen = randomPosicionXNaveGreen.nextInt(ANCHO_PANTALLA)- 150;
-                    System.out.println(posicionXNaveGreen);
-                    posicionYNaveGreen = -350; 
-                    destruyeNave = true;
-                    sonidoExplosionNaves.play();
-                }
+                //Llamada al método Disparo Lazer y posición
+                disparoLazer();
                 
-                //Sentencia para comprobar si hay colición entre disparo lazer y Asteroide1
-                Shape shapeColisionGrupoDisparoLazerGrupoAsteroide1 = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoAsteroide1);
-                //Variable para saber si hay colición
-                boolean colisionGrupoDisparoLazerGrupoAsteroide1 = shapeColisionGrupoDisparoLazerGrupoAsteroide1.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan lazer y Asteroide1
-                if ((colisionGrupoDisparoLazerGrupoAsteroide1 == false) && (colisionNaveGrupoAsteroide1 == true)) {
-                    sonidoExplosionAsteroides.play();
-                    retornoLazer = true;
-                }
+                //Llamada al método Aumento de Velocidad
+                aumentoVelocidad();
+               
+                //Llamada al método Actualizar marcador máximo puntos
+                puntosMaximos();
                 
-                //Sentencia para comprobar si hay colición entre disparo lazer y Asteroide2
-                Shape shapeColisionGrupoDisparoLazerGrupoAsteroide2 = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoAsteroide2);
-                //Variable para saber si hay colición
-                boolean colisionGrupoDisparoLazerGrupoAsteroide2 = shapeColisionGrupoDisparoLazerGrupoAsteroide2.getBoundsInLocal().isEmpty();
-                //Sentencia para saber si colicionan lazer y Asteroide1
-                if ((colisionGrupoDisparoLazerGrupoAsteroide2 == false) && (colisionNaveGrupoAsteroide2 == true)) {
-                    sonidoExplosionAsteroides.play();
-                    retornoLazer = true;
-                }
-                
-                //Posición disparo lazer
-                grupoDisparoLazer.setLayoutX(posicionXDisparoLazer);                
-                grupoDisparoLazer.setLayoutY(posicionYDisparoLazer);
-                
-                //Disparar con tecla espacio
-                if (dispararLazer == true) {                
-                    estadoEspacio = 1;
-                    sonidoLazer.play();
-                }
-                
-                if ((estadoEspacio == 1) && (ultimoEstadoEspacio == 0)){
-                    estadoDisparo = 1 - estadoDisparo;
-                }
-                ultimoEstadoEspacio = estadoEspacio;
-                if (estadoDisparo == 1){ 
-                    posicionYDisparoLazer -= velocidadLazer;
-                    velocidadLazer = 8;
-                    dispararLazer = false;
-                }
-                 else {
-                    posicionXDisparoLazer = posicionNaveX - 171;
-                    posicionYDisparoLazer = posicionNaveY - 108;
-                }
-                System.out.println("pulsar espacio = " + estadoEspacio);
-                System.out.println("disparando = " + estadoDisparo);
-                if ((posicionYDisparoLazer < -180) || (retornoLazer == true)){
-                    posicionXDisparoLazer = posicionNaveX - 171;
-                    posicionYDisparoLazer = posicionNaveY - 108;
-                    estadoDisparo = 0;
-                    velocidadLazer = 0;
-                    retornoLazer = false;
-                }
-                
-               //Aumento de velocidad por marcador             
-                
-                if (puntos == 5){                   
-                    velocidadNaveTitan = 1.5f;
-                    velocidadNaveBlue = 2.5f;
-                    velocidadNaveGreen = 2.0f; 
-                }             
-                if (puntos == 15) {
-                    velocidadXAsteroide1 = 2;
-                    velocidadYAsteroide1 = 4;
-                    VelocidadNaveIzquierda = -7;
-                    VelocidadNaveDerecha = 7;
-                    VelocidadNaveArriba = -7;
-                    VelocidadNaveAbajo = 7;
-                }
-                if (puntos == 20) {
-                    velocidadNaveTitan = 2f;
-                    velocidadNaveBlue = 3f;
-                    velocidadNaveGreen = 2.5f;
-                    velocidadXAsteroide2 = -5;
-                    velocidadYAsteroide2 = 3;
-                }
-                if (puntos == 25) {
-                    velocidadXAsteroide1 = 3;
-                    velocidadYAsteroide1 = 5;
-                    VelocidadNaveIzquierda = -9;
-                    VelocidadNaveDerecha = 9;
-                    VelocidadNaveArriba = -9;
-                    VelocidadNaveAbajo = 9;
-                }
-                if (puntos == 30) {
-                    velocidadNaveTitan = 2.5f;
-                    velocidadNaveBlue = 3.5f;
-                    velocidadNaveGreen = 3f;
-                }
-                if (puntos == 35) {
-                    velocidadXAsteroide1 = 3;
-                    velocidadYAsteroide1 = 5;
-                    VelocidadNaveIzquierda = -10;
-                    VelocidadNaveDerecha = 10;
-                    VelocidadNaveArriba = -10;
-                    VelocidadNaveAbajo = 10;
-                    velocidadXAsteroide2 = -6;
-                    velocidadYAsteroide2 = 4;
-                }
-                if (puntos == 40) {
-                    velocidadNaveTitan = 3f;
-                    velocidadNaveBlue = 4f;
-                    velocidadNaveGreen = 3.5f;
-                }
-                if (puntos == 45) {
-                    velocidadXAsteroide1 = 4;
-                    velocidadYAsteroide1 = 5;
-                    VelocidadNaveIzquierda = -11;
-                    VelocidadNaveDerecha = 11;
-                    VelocidadNaveArriba = -11;
-                    VelocidadNaveAbajo = 11;
-                    
-                }
-                if ((puntos == 50) && (incrementoVidas == false)){
-                    incrementoVidas = true;
-                    velocidadNaveTitan = 3.5f;
-                    velocidadNaveBlue = 4.5f;
-                    velocidadNaveGreen = 4f;
-                    velocidadXAsteroide2 = -7;
-                    velocidadYAsteroide2 = 4;
-                    vidas ++;
-                    textoNumeroVidas.setText(String.valueOf(vidas));
-                }
-                if (puntos == 55) {                   
-                    velocidadXAsteroide1 = 5;
-                    velocidadYAsteroide1 = 6;
-                    VelocidadNaveIzquierda = -12;
-                    VelocidadNaveDerecha = 12;
-                    VelocidadNaveArriba = -12;
-                    VelocidadNaveAbajo = 12;
-                    velocidadNaveTitan = 6f;
-                    velocidadNaveBlue = 8f;
-                }
-                if (puntos == 60) {
-                    velocidadNaveTitan = 4f;
-                    velocidadNaveBlue = 5f;
-                    velocidadNaveGreen = 4.5f;
-                }
-                
-                //Actualizacion de máximo de puntos
-                if (puntos > puntoMaximos) {
-                        //Cambiar la nueva puntuación
-                         puntoMaximos = puntos;
-                        textoPuntuacionMax.setText(String.valueOf(puntoMaximos));
-                }
-                //Parar juego si pierdes las vidas
-                if ((vidas <=0) || (puntos < 0)){
-                    imagenExplosionGameOverView.setLayoutX(posicionNaveX - 77);                
-                    imagenExplosionGameOverView.setLayoutY(posicionNaveY + 40);
-                    root.getChildren().add(imagenExplosionGameOverView);
-                    root.getChildren().remove(nave);
-                    sonidoExplosionGameOver.play();
-                    root.getChildren().add(imagenGameOverView);
-                    movimiento.stop();
-                }                
+                //Llamada al  método Fin Partida
+                finPartida();
+        
             })
         ); //Final timeLine 
         movimiento.setCycleCount (Timeline.INDEFINITE);
         movimiento.play();
         
+        //Lamada al método Pulsar Teclas
+        pulsarTeclas();
         
-        //Detección de las pulsaciones de las teclas
-        escena.setOnKeyPressed((KeyEvent event) -> {
-            switch(event.getCode()) {
-                case LEFT:
-                    //Pulsada tecla izquierda
-                    velocidadNaveX = VelocidadNaveIzquierda;
-                    break;
-                case RIGHT:
-                    //Pulsada tecla derecha
-                    velocidadNaveX = VelocidadNaveDerecha;
-                    break;
-                case UP:
-                    //Pulsada tecla arriba
-                    velocidadNaveY = VelocidadNaveArriba;
-                    break;
-                case DOWN:
-                    //Pulsada tecla abajo
-                    velocidadNaveY = VelocidadNaveAbajo;
-                    break;
-                case SPACE:
-                    //Pulsada tecla espacio                    
-                    dispararLazer = true;                    
-                    break;
-                case ENTER:
-                    //Pulsada tecla enter                    
-                    resetGame();                   
-                    break;
-            }
-        });
-        //Detección de dejar de pulsar las teclas
-        escena.setOnKeyReleased((KeyEvent event) -> {
-            switch(event.getCode()) {
-                case LEFT:
-                    //Dejar de pulsar tecla izquierda
-                    velocidadNaveX = 0;
-                    break;
-                case RIGHT:
-                    //Dejar de pulsar tecla derecha
-                    velocidadNaveX = 0;
-                    break;
-                case UP:
-                    //Dejar de pulsar tecla arriba
-                    velocidadNaveY = 0;
-                    break;
-                case DOWN:
-                    //Dejar de pulsar tecla abajo
-                    velocidadNaveY = 0;
-                    break;
-                case SPACE:
-                    //Dejar de pulsar tecla espacio
-                    //dispararLazer = false; 
-                    ultimoEstadoEspacio = 0;
-                    estadoEspacio = 0;
-                    break;
-            }
-        });
         
     }
+    //FIN DEL TIMELINE
     
     //Método para crear nave
     private void crearNave(){
@@ -1179,6 +800,548 @@ public class Alien extends Application {
         paneVidas.getChildren().add(textoVidas);
         paneVidas.getChildren().add(textoNumeroVidas);
     }
+    
+    //Método para crear imagen Game Over
+    private void imagenGameOver(){
+        //Imagen Game Over 
+        var imagenGameOver = new Image(getClass().getResourceAsStream("/images/GameOver.png"));
+        imagenGameOverView = new ImageView(imagenGameOver);
+        
+        //Posicionar imagen Game Over
+        imagenGameOverView.setLayoutX(ANCHO_PANTALLA/2 - 258);
+        imagenGameOverView.setLayoutY(ALTO_PANTALLA/2 - 62);
+    }
+    
+    //Método para añadir al contenedor
+    private void añadirContenedor(){
+        //Añadir al contenedor
+        root.getChildren().add(fondoPantallaView1);
+        root.getChildren().add(fondoPantallaView2);
+        root.getChildren().add(grupoNaveTitan);
+        root.getChildren().add(grupoNaveBlue);
+        root.getChildren().add(grupoNaveGreen);
+        root.getChildren().add(grupoAsteroide1);
+        root.getChildren().add(grupoAsteroide2);
+        root.getChildren().add(grupoDisparoLazer);
+        root.getChildren().add(nave);
+        root.getChildren().add(panePuntuacion);
+    }
+    
+    //Método para el moviniemto del fondo
+    private void moviminetoFondo(){
+        //Movimiento del fondo comprobando que ha llegado al final de la pantalla
+        fondoPantallaView1.setLayoutY(posicionYFondo1);
+        posicionYFondo1+= velocidadFondo;
+        fondoPantallaView2.setLayoutY(posicionYFondo2);
+        posicionYFondo2+= velocidadFondo;
+        if (posicionYFondo1 >= ALTO_PANTALLA) {
+            posicionYFondo1 = -ALTO_PANTALLA;
+        }
+        if (posicionYFondo2 >= ALTO_PANTALLA) {
+            posicionYFondo2 = -ALTO_PANTALLA;
+        }
+    }
+    
+    //Método para el moviniemto del fondo
+    private void movimientoNave(){
+        //Actualizar posición X de la nave
+        posicionNaveX += velocidadNaveX;
+        nave.setTranslateX(posicionNaveX);
+        //Actualizar posición Y de la nave
+        posicionNaveY += velocidadNaveY;
+        nave.setTranslateY(posicionNaveY);               
+
+        //Comprobar si se sale la nave por la izquierda
+        if (posicionNaveX < 50) {
+            posicionNaveX = 50;
+        }else{
+            //Comprobar que no se sale por la derecha
+            if (posicionNaveX > ANCHO_PANTALLA -50) {
+                posicionNaveX = ANCHO_PANTALLA -50;
+            }
+        }
+
+        //Comprobar si se sale la nave por arriba
+        if (posicionNaveY < -30) {
+            posicionNaveY = -30;
+        }else{
+            //Comprobar que no se sale por abajo
+            if (posicionNaveY > ALTO_PANTALLA -150) {
+                posicionNaveY = ALTO_PANTALLA -150;
+            }
+        }
+    } 
+    
+    //Método para el movimiento Nave Titán
+    private void movimientoNaveTitan(){
+        //Movimiento nave Titan
+        grupoNaveTitan.setLayoutY(posicionYNaveTitan);
+        posicionYNaveTitan+= velocidadNaveTitan;
+        grupoNaveTitan.setLayoutX(posicionXNaveTitan);
+        //Posición aleatoria nave Titan
+        if (posicionYNaveTitan > ALTO_PANTALLA) {
+            posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+            posicionYNaveTitan = -250;
+            puntos --;
+            textoPuntuacion.setText(String.valueOf(puntos));
+        }
+    }
+    
+    //Método para el movimiento Nave Blue
+    private void movimientoNaveBlue(){
+        //Movimiento nave Blue
+        grupoNaveBlue.setLayoutY(posicionYNaveBlue);
+        posicionYNaveBlue+= velocidadNaveBlue;
+        grupoNaveBlue.setLayoutX(posicionXNaveBlue);
+
+        //Posición aleatoria nave Blue
+        if (posicionYNaveBlue > ALTO_PANTALLA) {
+            posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+            posicionYNaveBlue = -250;
+            puntos --;
+            textoPuntuacion.setText(String.valueOf(puntos));
+        }
+    }
+    
+    //Método para el movimiento Nave Green
+    private void movimientoNaveGreen(){
+        //Movimiento nave Green
+        grupoNaveGreen.setLayoutY(posicionYNaveGreen);
+        posicionYNaveGreen+= velocidadNaveGreen;
+        grupoNaveGreen.setLayoutX(posicionXNaveGreen);
+
+        //Posición aleatoria nave Green
+        if (posicionYNaveGreen > ALTO_PANTALLA) {
+            posicionXNaveGreen = randomPosicionXNaveGreen.nextInt(ANCHO_PANTALLA)- 150;
+            System.out.println(posicionXNaveGreen);
+            posicionYNaveGreen = -350;
+            puntos --;
+            textoPuntuacion.setText(String.valueOf(puntos));
+        }
+    }
+    
+    //Método para el movimiento Asteroide1
+    private void movimientoAsteroide1(){
+        //Movimiento Asteroide1
+        grupoAsteroide1.setLayoutY(posicionYAsteroide1);
+        posicionYAsteroide1 += velocidadYAsteroide1;
+        grupoAsteroide1.setLayoutX(posicionXAsteroide1);
+        posicionXAsteroide1 -= velocidadXAsteroide1;
+
+        //Posición aleatoria Asteroide1
+        if (posicionYAsteroide1 > ALTO_PANTALLA) {
+            posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA + 200);
+            posicionYAsteroide1 = -250;
+        }
+    }
+    
+    //Método para el movimiento Asteroide2
+    private void movimientoAsteroide2(){
+        //Movimiento Asteroide2
+        grupoAsteroide2.setLayoutY(posicionYAsteroide2);
+        posicionYAsteroide2 += velocidadYAsteroide2;
+        grupoAsteroide2.setLayoutX(posicionXAsteroide2);
+        posicionXAsteroide2 -= velocidadXAsteroide2;
+
+        //Posición aleatoria Asteroide2
+        if (posicionXAsteroide2 > ANCHO_PANTALLA) {
+            posicionYAsteroide2 = randomPosicionYAsteroide2.nextInt(300)*-1;
+            posicionXAsteroide2 = -700;
+        }
+    }
+    
+    //Método para colision Nave y Nave Titán
+    private void colisionNaveNaveTitan(){
+        //Sentencia para comprobar si hay colisión entre nave y nave Titan
+        Shape shapeColisionNaveGrupoNaveTitan = Shape.intersect(zonaContactoNave, zonaContactoTitan);
+        //Variable para saber si hay colición
+        colisionNaveGrupoNaveTitan = shapeColisionNaveGrupoNaveTitan.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan la nave y la nave Titan
+        if (colisionNaveGrupoNaveTitan == false) {
+            //Perdida de vidas
+            vidas--;
+            textoNumeroVidas.setText(String.valueOf(vidas));
+            posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+            posicionYNaveTitan = -250;
+            if (vidas != 0){
+            sonidoChoqueNave.play();
+            }
+        }
+    }
+    
+    //Método para colision Nave y Nave Blue
+    private void colisionNaveNaveBlue(){
+        //Sentencia para comprobar si hay colición entre nave y nave Blue
+        Shape shapeColisionNaveGrupoNaveBlue = Shape.intersect(zonaContactoNave, zonaContactoBlue);
+        //Variable para saber si hay colición
+        colisionNaveGrupoNaveBlue = shapeColisionNaveGrupoNaveBlue.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan la nave y la nave Blue
+        if (colisionNaveGrupoNaveBlue == false) {
+            //Perdida de vidas
+            vidas--;
+            textoNumeroVidas.setText(String.valueOf(vidas));
+            posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+            posicionYNaveBlue = -250;  
+            if (vidas != 0){
+            sonidoChoqueNave.play();
+            }
+        }
+    }
+    
+    //Método para colision Nave y Nave Blue
+    private void colisionNaveNaveGreen(){
+        //Sentencia para comprobar si hay colición entre nave y nave Green
+        Shape shapeColisionNaveGrupoNaveGreen = Shape.intersect(zonaContactoNave, zonaContactoGreen);
+        //Variable para saber si hay colición
+        colisionNaveGrupoNaveGreen = shapeColisionNaveGrupoNaveGreen.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan la nave y la nave Green
+        if (colisionNaveGrupoNaveGreen == false) {
+            //Perdida de vidas
+            vidas--;
+            textoNumeroVidas.setText(String.valueOf(vidas));
+            posicionXNaveGreen = randomPosicionXNaveGreen.nextInt(ANCHO_PANTALLA)- 150;
+            System.out.println(posicionXNaveGreen);
+            posicionYNaveGreen = -350;  
+            if (vidas != 0){
+            sonidoChoqueNave.play();
+            }
+        }
+    }
+    
+    //Método para colision Nave y Asterooide1
+    private void colisionNaveAsteroide1(){
+        //Sentencia para comprobar si hay colición entre nave y Asteroide1
+        Shape shapeColisionNaveGrupoAsteroide1 = Shape.intersect(zonaContactoNave, zonaContactoAsteroide1);
+        //Variable para saber si hay colición
+        colisionNaveGrupoAsteroide1 = shapeColisionNaveGrupoAsteroide1.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan la nave y Asteroide1
+        if (colisionNaveGrupoAsteroide1 == false) {
+            //Perdida de vidas
+            vidas--;
+            textoNumeroVidas.setText(String.valueOf(vidas));
+            posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA + 150);
+            posicionYAsteroide1 = -250;
+            if (vidas != 0){
+            sonidoChoqueNave.play();
+            } 
+        }
+    }
+    
+    //Método para colision Nave y Asterooide1
+    private void colisionNaveAsteroide2(){
+        //Sentencia para comprobar si hay colición entre nave y Asteroide2
+        Shape shapeColisionNaveGrupoAsteroide2 = Shape.intersect(zonaContactoNave, zonaContactoAsteroide2);
+        //Variable para saber si hay colición
+        colisionNaveGrupoAsteroide2 = shapeColisionNaveGrupoAsteroide2.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan la nave y Asteroide2
+        if (colisionNaveGrupoAsteroide2 == false) {
+            //Perdida de vidas
+            vidas--;
+            textoNumeroVidas.setText(String.valueOf(vidas));
+            posicionYAsteroide2 = randomPosicionYAsteroide2.nextInt(300)*-1;
+            posicionXAsteroide2 = -700;
+            if (vidas != 0){
+            sonidoChoqueNave.play();
+            }
+        }
+    }
+    
+    //Método para colision Lazer y Nave Titán
+    private void colisionLazerNaveTitan(){
+        //Sentencia para comprobar si hay colición entre disparo lazer y nave Titán
+        Shape shapeColisionGrupoDisparoLazerGrupoNaveTitan = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoTitan);
+        //Variable para saber si hay colición
+        colisionGrupoDisparoLazerGrupoNaveTitan = shapeColisionGrupoDisparoLazerGrupoNaveTitan.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan la nave y la nave Titan
+        if ((colisionGrupoDisparoLazerGrupoNaveTitan == false) && (colisionNaveGrupoNaveTitan == true)) {
+            //Perdida de vidas 
+            retornoLazer = true;
+            puntos ++;
+            incrementoVidas = false;
+            textoPuntuacion.setText(String.valueOf(puntos));
+            posicionXNaveTitan = randomPosicionXNaveTitan.nextInt(ANCHO_PANTALLA-190);
+            posicionYNaveTitan = -250;
+            destruyeNave = true;
+            sonidoExplosionNaves.play();
+        }
+    }
+    
+    //Método para colision Lazer y Nave Blue
+    private void colisionLazerNaveBlue(){
+        //Sentencia para comprobar si hay colición entre disparo lazer y nave Blue
+        Shape shapeColisionGrupoDisparoLazerGrupoNaveBlue = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoBlue);
+        //Variable para saber si hay colición
+        colisionGrupoDisparoLazerGrupoNaveBlue = shapeColisionGrupoDisparoLazerGrupoNaveBlue.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan la nave y la nave Blue
+        if ((colisionGrupoDisparoLazerGrupoNaveBlue == false) && (colisionNaveGrupoNaveBlue == true)) {
+            //Perdida de vidas 
+            retornoLazer = true;
+            puntos ++;
+            incrementoVidas = false;
+            textoPuntuacion.setText(String.valueOf(puntos));
+            posicionXNaveBlue = randomPosicionXNaveBlue.nextInt(ANCHO_PANTALLA-190);
+            posicionYNaveBlue = -250;
+            destruyeNave = true;
+            sonidoExplosionNaves.play();
+        }
+    }
+    
+    //Método para colision Lazer y Nave Green
+    private void colisionLazerNaveGreen(){
+        //Sentencia para comprobar si hay colición entre disparo lazer y nave Green
+        Shape shapeColisionGrupoDisparoLazerGrupoNaveGreen = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoGreen);
+        //Variable para saber si hay colición
+        colisionGrupoDisparoLazerGrupoNaveGreen = shapeColisionGrupoDisparoLazerGrupoNaveGreen.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan la nave y la nave Green
+        if ((colisionGrupoDisparoLazerGrupoNaveGreen == false) && (colisionNaveGrupoNaveGreen == true)) {
+            //Perdida de vidas 
+            retornoLazer = true;
+            puntos ++;
+            incrementoVidas = false;
+            textoPuntuacion.setText(String.valueOf(puntos));
+            posicionXNaveGreen = randomPosicionXNaveGreen.nextInt(ANCHO_PANTALLA)- 150;
+            System.out.println(posicionXNaveGreen);
+            posicionYNaveGreen = -350; 
+            destruyeNave = true;
+            sonidoExplosionNaves.play();
+        }
+    }
+    
+    //Método para colision Lazer y Asteroide1
+    private void colisionLazerAsteroide1(){
+        //Sentencia para comprobar si hay colición entre disparo lazer y Asteroide1
+        Shape shapeColisionGrupoDisparoLazerGrupoAsteroide1 = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoAsteroide1);
+        //Variable para saber si hay colición
+        colisionGrupoDisparoLazerGrupoAsteroide1 = shapeColisionGrupoDisparoLazerGrupoAsteroide1.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan lazer y Asteroide1
+        if ((colisionGrupoDisparoLazerGrupoAsteroide1 == false) && (colisionNaveGrupoAsteroide1 == true)) {
+            sonidoExplosionAsteroides.play();
+            retornoLazer = true;
+        }
+    }
+    
+    //Método para colision Lazer y Asteroide2
+    private void colisionLazerAsteroide2(){
+        //Sentencia para comprobar si hay colición entre disparo lazer y Asteroide2
+        Shape shapeColisionGrupoDisparoLazerGrupoAsteroide2 = Shape.intersect(ZonaContactoDisparoLazer, zonaContactoAsteroide2);
+        //Variable para saber si hay colición
+        colisionGrupoDisparoLazerGrupoAsteroide2 = shapeColisionGrupoDisparoLazerGrupoAsteroide2.getBoundsInLocal().isEmpty();
+        //Sentencia para saber si colicionan lazer y Asteroide1
+        if ((colisionGrupoDisparoLazerGrupoAsteroide2 == false) && (colisionNaveGrupoAsteroide2 == true)) {
+            sonidoExplosionAsteroides.play();
+            retornoLazer = true;
+        }
+    }
+    
+    //Método para Disparo Lazer
+    private void disparoLazer(){
+        //Posición disparo lazer
+        grupoDisparoLazer.setLayoutX(posicionXDisparoLazer);                
+        grupoDisparoLazer.setLayoutY(posicionYDisparoLazer);
+
+        //Disparar con tecla espacio
+        if (dispararLazer == true) {                
+            estadoEspacio = 1;
+            sonidoLazer.play();
+        }
+
+        if ((estadoEspacio == 1) && (ultimoEstadoEspacio == 0)){
+            estadoDisparo = 1 - estadoDisparo;
+        }
+        ultimoEstadoEspacio = estadoEspacio;
+        if (estadoDisparo == 1){ 
+            posicionYDisparoLazer -= velocidadLazer;
+            velocidadLazer = 8;
+            dispararLazer = false;
+            estadoEspacio = 0;
+        }
+         else {
+            posicionXDisparoLazer = posicionNaveX - 171;
+            posicionYDisparoLazer = posicionNaveY - 108;
+        }
+        System.out.println("pulsar espacio = " + estadoEspacio);
+        System.out.println("disparando = " + estadoDisparo);
+        
+        if ((posicionYDisparoLazer < -180) || (retornoLazer == true)){
+            posicionXDisparoLazer = posicionNaveX - 171;
+            posicionYDisparoLazer = posicionNaveY - 108;
+            estadoDisparo = 0;
+            velocidadLazer = 0;
+            retornoLazer = false;
+        }
+    }
+    
+    //Método para Aumento de Velocidad
+    private void aumentoVelocidad(){
+        //Aumento de velocidad por marcador  
+        if (puntos == 5){                   
+            velocidadNaveTitan = 1.5f;
+            velocidadNaveBlue = 2.5f;
+            velocidadNaveGreen = 2.0f; 
+        }             
+        if (puntos == 15) {
+            velocidadXAsteroide1 = 2;
+            velocidadYAsteroide1 = 4;
+            VelocidadNaveIzquierda = -7;
+            VelocidadNaveDerecha = 7;
+            VelocidadNaveArriba = -7;
+            VelocidadNaveAbajo = 7;
+        }
+        if (puntos == 20) {
+            velocidadNaveTitan = 2.5f;
+            velocidadNaveBlue = 3.5f;
+            velocidadNaveGreen = 3f;
+            velocidadXAsteroide2 = -5;
+            velocidadYAsteroide2 = 3;
+        }
+        if (puntos == 25) {
+            velocidadXAsteroide1 = 3;
+            velocidadYAsteroide1 = 5;
+            VelocidadNaveIzquierda = -9;
+            VelocidadNaveDerecha = 9;
+            VelocidadNaveArriba = -9;
+            VelocidadNaveAbajo = 9;
+        }
+        if (puntos == 30) {
+            velocidadNaveTitan = 3f;
+            velocidadNaveBlue = 4f;
+            velocidadNaveGreen = 3.5f;
+        }
+        if (puntos == 35) {
+            velocidadXAsteroide1 = 3;
+            velocidadYAsteroide1 = 5;
+            VelocidadNaveIzquierda = -10;
+            VelocidadNaveDerecha = 10;
+            VelocidadNaveArriba = -10;
+            VelocidadNaveAbajo = 10;
+            velocidadXAsteroide2 = -6;
+            velocidadYAsteroide2 = 4;
+        }
+        if (puntos == 40) {
+            velocidadNaveTitan = 4f;
+            velocidadNaveBlue = 5f;
+            velocidadNaveGreen = 4.5f;
+        }
+        if (puntos == 45) {
+            velocidadXAsteroide1 = 4;
+            velocidadYAsteroide1 = 5;
+            VelocidadNaveIzquierda = -11;
+            VelocidadNaveDerecha = 11;
+            VelocidadNaveArriba = -11;
+            VelocidadNaveAbajo = 11;
+
+        }
+        if ((puntos == 50) && (incrementoVidas == false)){
+            incrementoVidas = true;
+            velocidadNaveTitan = 4.5f;
+            velocidadNaveBlue = 5.5f;
+            velocidadNaveGreen = 5f;
+            velocidadXAsteroide2 = -7;
+            velocidadYAsteroide2 = 4;
+            vidas ++;
+            textoNumeroVidas.setText(String.valueOf(vidas));
+        }
+        if (puntos == 55) {                   
+            velocidadXAsteroide1 = 5;
+            velocidadYAsteroide1 = 6;
+            VelocidadNaveIzquierda = -12;
+            VelocidadNaveDerecha = 12;
+            VelocidadNaveArriba = -12;
+            VelocidadNaveAbajo = 12;
+            velocidadNaveTitan = 6f;
+            velocidadNaveBlue = 8f;
+        }
+        if (puntos == 60) {
+            velocidadNaveTitan = 5.5f;
+            velocidadNaveBlue = 6.5f;
+            velocidadNaveGreen = 6f;
+        }
+    }
+    
+    //Método para Actualizar Puntuación Máxima
+    private void puntosMaximos(){
+        //Actualizacion de máximo de puntos
+        if (puntos > puntoMaximos) {
+                //Cambiar la nueva puntuación
+                 puntoMaximos = puntos;
+                textoPuntuacionMax.setText(String.valueOf(puntoMaximos));
+        }
+    }
+    
+    //Método para Fin de Partida
+    private void finPartida(){
+        //Parar juego si pierdes las vidas, Game Over
+        if ((vidas <=0) || (puntos < 0)){
+            imagenExplosionGameOverView.setLayoutX(posicionNaveX - 77);                
+            imagenExplosionGameOverView.setLayoutY(posicionNaveY + 40);
+            root.getChildren().add(imagenExplosionGameOverView);
+            root.getChildren().remove(nave);
+            sonidoExplosionGameOver.play();
+            root.getChildren().add(imagenGameOverView);
+            movimiento.stop();
+        }
+    }
+    
+    //Método para detectar pulsación de teclas
+    private void pulsarTeclas(){
+        //Detección de las pulsaciones de las teclas
+        escena.setOnKeyPressed((KeyEvent event) -> {
+            switch(event.getCode()) {
+                case LEFT:
+                    //Pulsada tecla izquierda
+                    velocidadNaveX = VelocidadNaveIzquierda;
+                    break;
+                case RIGHT:
+                    //Pulsada tecla derecha
+                    velocidadNaveX = VelocidadNaveDerecha;
+                    break;
+                case UP:
+                    //Pulsada tecla arriba
+                    velocidadNaveY = VelocidadNaveArriba;
+                    break;
+                case DOWN:
+                    //Pulsada tecla abajo
+                    velocidadNaveY = VelocidadNaveAbajo;
+                    break;
+                case SPACE:
+                    //Pulsada tecla espacio                    
+                    dispararLazer = true;                    
+                    break;
+                case ENTER:
+                    //Pulsada tecla enter                    
+                    resetGame();                   
+                    break;
+            }
+        });
+        //Detección de dejar de pulsar las teclas
+        escena.setOnKeyReleased((KeyEvent event) -> {
+            switch(event.getCode()) {
+                case LEFT:
+                    //Dejar de pulsar tecla izquierda
+                    velocidadNaveX = 0;
+                    break;
+                case RIGHT:
+                    //Dejar de pulsar tecla derecha
+                    velocidadNaveX = 0;
+                    break;
+                case UP:
+                    //Dejar de pulsar tecla arriba
+                    velocidadNaveY = 0;
+                    break;
+                case DOWN:
+                    //Dejar de pulsar tecla abajo
+                    velocidadNaveY = 0;
+                    break;
+                case SPACE:
+                    //Dejar de pulsar tecla espacio
+                    //dispararLazer = false; 
+                    ultimoEstadoEspacio = 0;
+                    estadoEspacio = 0;
+                    break;
+            }
+        });
+    }
+    
     //Método para reiniciar el juego
     private void resetGame() {
         //Reiniciar Timeline
@@ -1222,6 +1385,8 @@ public class Alien extends Application {
         root.getChildren().remove(imagenExplosionGameOverView);
         root.getChildren().add(nave);
         root.getChildren().remove(imagenGameOverView);
+        //Reinicio Estado tecla escape
+        estadoEspacio =0;
     }
     
     public static void main(String[] args) {
