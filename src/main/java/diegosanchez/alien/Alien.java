@@ -1,7 +1,7 @@
 /*PongFX
 
 Juego parecido al clásico Space Invaders donde una nave tendrá
-que destruir los marcianos y evitar chocar con los asteroides.
+que destruir naves enemigas y evitar chocar con los asteroides.
 
 Diego Jesús Sánchez Del Corral
 2021*/
@@ -206,7 +206,7 @@ public class Alien extends Application {
         //Llamada al método para nave Titán
         crearNaveTitan();   
         
-        //Llamada al método para nave Titán
+        //Llamada al método para nave Blue
         crearNaveBlue(); 
         
         //Llamada método para nave Green
@@ -325,7 +325,7 @@ public class Alien extends Application {
         
         
     }
-    //FIN DEL TIMELINE
+    //FIN DEL MÉTODO ESTAR
     
     //Método para crear nave
     private void crearNave(){
