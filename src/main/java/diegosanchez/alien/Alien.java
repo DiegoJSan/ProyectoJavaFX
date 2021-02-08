@@ -95,6 +95,9 @@ public class Alien extends Application {
     Random randomPosicionXNaveGreen = new Random();
         int posicionXNaveGreen = randomPosicionXNaveGreen.nextInt(ANCHO_PANTALLA)-150;
     Group grupoNaveGreen;
+    
+    //Variable Nave Green
+    Polyline zonaContactoGreen;
         
     //Variable Velocidad Nave Green
     float velocidadNaveGreen = 1.5f;
@@ -104,12 +107,14 @@ public class Alien extends Application {
     Random randomPosicionXAsteroide1 = new Random();
         int posicionXAsteroide1 = randomPosicionXAsteroide1.nextInt(ANCHO_PANTALLA);
     Group grupoAsteroide1;
+    Polyline zonaContactoAsteroide1;
     
     //Variable para posocion Asteroide2
     int posicionXAsteroide2 = -700;
     Random randomPosicionYAsteroide2 = new Random();
         int posicionYAsteroide2 = randomPosicionYAsteroide2.nextInt(300)*-1;
     Group grupoAsteroide2;
+    Polyline zonaContactoAsteroide2;
         
     //Variable Velocidad Asteroide1
     int velocidadXAsteroide1 = 1;
@@ -131,15 +136,20 @@ public class Alien extends Application {
     int velocidadLazer = 0;
     boolean retornoLazer = true;
     boolean destruyeNave;
+    Group grupoDisparoLazer;
+    Circle ZonaContactoDisparoLazer;
+
 
     //Variables y Constante para puntuación
     final int TAMAÑO_LETRAS = 24;
     Text textoPuntuacion;
+    Text textoPuntuacionMax;
     int vidas = 3;
     int puntos = 0;
     int puntoMaximos = 0;
     Text textoNumeroVidas;
     boolean incrementoVidas;
+    HBox panePuntuacion;
 
     //Variable para sonidos
     AudioClip sonidoLazer;
@@ -154,11 +164,13 @@ public class Alien extends Application {
     //Variable para la pantalla
     Pane root;
     
+    
     //Variables para las imagenes
     ImageView fondoPantallaView1;
     ImageView fondoPantallaView2;
     ImageView imagenExplosionGameOverView;
     ImageView imagenGameOverView;
+    ImageView imagenExplosionGameOver;
 
     @Override
     public void start(Stage primeraEtapa) {
@@ -185,250 +197,36 @@ public class Alien extends Application {
         //Llamada al método para nave Titán
         crearNaveBlue(); 
         
+        //Llamada método para nave Green
+        crearNaveGreen();
         
-        //Imagen nave Green
-        var naveGreen = new Image(getClass().getResourceAsStream("/images/NaveGreen.png"));
-        ImageView naveGreenView = new ImageView(naveGreen);
+        //Lamada al método para Asteroide1
+        crearAsteroide1();
         
-        //Zona de contacto nave Green
-        Polyline zonaContactoGreen = new Polyline();
-        zonaContactoGreen.getPoints().addAll(new Double[]{
-            0.0, 0.0,
-            -65.0, 100.0,
-            -55.0, 170.0 ,
-            -183.0, 280.0,
-            -183.0, 305.0,
-            0.0, 230.0,
-            183.0, 305.0,
-            183.0, 280.0,
-            55.0, 170.0,
-            65.0, 100.0
-        });
-        zonaContactoGreen.setFill(Color.YELLOW);
-        zonaContactoGreen.setVisible(false);
-        zonaContactoGreen.setLayoutX(183);
-        zonaContactoGreen.setLayoutY(0);
+        //Llamada al método para Asteroide2
+        crearAsteroide2();
         
-        //Agrupar imagen y objetos de la nave Blue
-        grupoNaveGreen = new Group();
-        grupoNaveGreen.getChildren().add(zonaContactoGreen);
-        grupoNaveGreen.getChildren().add(naveGreenView);
+        //Llamada al método para Imagen Explsión Game Over
+        crearImagenGameOver();
         
-        //Escalar nave Blue
-        grupoNaveGreen.setScaleX(0.25);
-        grupoNaveGreen.setScaleY(0.25);
+        //Llamada al método para crear y sonido de Lazer
+        crearLazer();
         
-        //Rotar nave Blue
-        grupoNaveGreen.setRotate(180);
+        //Llamada al metodo sonido explosión naves
+        explosionNaves();
         
-        //Imagen nave Asteroide1
-        var asteroide1 = new Image(getClass().getResourceAsStream("/images/Asteroide_1.png"));
-        ImageView Asteroide1View = new ImageView(asteroide1);
+        //Llamada al método sonido explosión Asteroides
+        explosionAsteroides();
         
-        //Zona de contacto Asteroide1
-        Polyline zonaContactoAsteroide1 = new Polyline();
-        zonaContactoAsteroide1.getPoints().addAll(new Double[]{
-            0.0, 0.0,
-            -150.0, 20.0,
-            -300.0, 250.0 ,
-            -180.0, 380.0,
-            0.0, 455.0,
-            235.0, 260.0,
-            140.0, 75.0,
-            0.0, 0.0,
-        });
-        zonaContactoAsteroide1.setFill(Color.YELLOW);
-        zonaContactoAsteroide1.setVisible(false);
-        zonaContactoAsteroide1.setLayoutX(300);
-        zonaContactoAsteroide1.setLayoutY(0);
+        //Llamada al método sonido explosión Game Over
+        explosionGameOver();
         
-        //Agrupar imagen y objetos de Asteroide1
-        grupoAsteroide1 = new Group();
-        grupoAsteroide1.getChildren().add(zonaContactoAsteroide1);
-        grupoAsteroide1.getChildren().add(Asteroide1View);
+        //Llamada al método soonido explosion Choque Nave
+        explosionChoqueNave();
         
-        //Escalar Asteroide 1
-        grupoAsteroide1.setScaleX(0.15);
-        grupoAsteroide1.setScaleY(0.15);
+        //Llamada al método para crear marcadores
+        marcadores();
         
-        //Imagen nave Asteroide2
-        var asteroide2 = new Image(getClass().getResourceAsStream("/images/Asteroide_2.png"));
-        ImageView Asteroide2View = new ImageView(asteroide2);
-        
-        //Zona de contacto Asteroide2
-        Polyline zonaContactoAsteroide2 = new Polyline();
-        zonaContactoAsteroide2.getPoints().addAll(new Double[]{
-            0.0, 0.0,
-            -150.0, 53.0,
-            -240.0, 270.0 ,
-            -160.0,440.0,
-            -5.0, 475.0,
-            120.0, 460.0,
-            260.0, 290.0,
-            190.0, 120.0,
-            110.0, 95.0,
-            60.0, 5.0,
-            0.0, 0.0,
-        });
-        zonaContactoAsteroide2.setFill(Color.YELLOW);
-        zonaContactoAsteroide2.setVisible(false);
-        zonaContactoAsteroide2.setLayoutX(240);
-        zonaContactoAsteroide2.setLayoutY(0);
-        
-        //Agrupar imagen y objetos de Asteroide2
-        grupoAsteroide2 = new Group();
-        grupoAsteroide2.getChildren().add(zonaContactoAsteroide2);
-        grupoAsteroide2.getChildren().add(Asteroide2View);
-        
-        //Escalar Asteroide 2
-        grupoAsteroide2.setScaleX(0.15);
-        grupoAsteroide2.setScaleY(0.15);
-        
-        //Imagen explosion game over
-        var imagenExplosionGameOver = new Image(getClass().getResourceAsStream("/images/explosionGameOver.png"));
-        imagenExplosionGameOverView = new ImageView(imagenExplosionGameOver);
-                
-        //Imagen disparo lazer
-        var disparoLazer = new Image(getClass().getResourceAsStream("/images/DisparoLaser.png"));
-        ImageView disparoLazerView = new ImageView(disparoLazer);
-        
-        //Zona decontacto disparo lazer
-        Circle ZonaContactoDisparoLazer = new Circle();
-        ZonaContactoDisparoLazer.setCenterX(86);
-        ZonaContactoDisparoLazer.setCenterY(115);
-        ZonaContactoDisparoLazer.setRadius(20);
-        ZonaContactoDisparoLazer.setFill(Color.YELLOW);
-        ZonaContactoDisparoLazer.setVisible(false);  
-                
-        //Agrupar imagen y objetos de disparo lazer
-        Group grupoDisparoLazer = new Group();
-        grupoDisparoLazer.getChildren().add(disparoLazerView);
-        grupoDisparoLazer.getChildren().add(ZonaContactoDisparoLazer);
-        
-        //Escalar disparo lazer
-        grupoDisparoLazer.setScaleX(0.25);
-        grupoDisparoLazer.setScaleY(0.25); 
-        
-        //Sonido disparo lazer //   
-        URL urlAudio = getClass().getResource("/sonidos/SHOOT013.mp3");
-        if(urlAudio != null) {
-            try {
-                sonidoLazer = new AudioClip(urlAudio.toURI().toString());
-            } catch (URISyntaxException ex) {
-                System.out.println("Error en el formato de ruta de archivo de audio");
-            }            
-        } else {
-        System.out.println("No se ha encontrado el archivo de audio");
-        }
-        
-        //Sonido de explosión naves enemigas //   
-        URL urlExplosionNaves = getClass().getResource("/sonidos/explosion_Naves.mp3");
-        if(urlExplosionNaves != null) {
-            try {
-                sonidoExplosionNaves = new AudioClip(urlExplosionNaves.toURI().toString());
-            } catch (URISyntaxException ex) {
-                System.out.println("Error en el formato de ruta de archivo de audio");
-            }            
-        } else {
-        System.out.println("No se ha encontrado el archivo de audio");
-        }
-        
-        //Sonido de explosión asteroides //   
-        URL urlExplosionAsteroides = getClass().getResource("/sonidos/explosion_asteroides.mp3");
-        if(urlExplosionAsteroides != null) {
-            try {
-                sonidoExplosionAsteroides = new AudioClip(urlExplosionAsteroides.toURI().toString());
-            } catch (URISyntaxException ex) {
-                System.out.println("Error en el formato de ruta de archivo de audio");
-            }            
-        } else {
-        System.out.println("No se ha encontrado el archivo de audio");
-        }
-        
-        //Sonido de explosión game over //   
-        URL urlExplosionGameOver = getClass().getResource("/sonidos/explosion1GameOver.mp3");
-        if(urlExplosionGameOver != null) {
-            try {
-                sonidoExplosionGameOver = new AudioClip(urlExplosionGameOver.toURI().toString());
-            } catch (URISyntaxException ex) {
-                System.out.println("Error en el formato de ruta de archivo de audio");
-            }            
-        } else {
-        System.out.println("No se ha encontrado el archivo de audio");
-        }
-        
-        //Sonido de choque de la nave   
-        URL urlChoqueNave = getClass().getResource("/sonidos/ChoqueNave.mp3");
-        if(urlChoqueNave != null) {
-            try {
-                sonidoChoqueNave = new AudioClip(urlChoqueNave.toURI().toString());
-            } catch (URISyntaxException ex) {
-                System.out.println("Error en el formato de ruta de archivo de audio");
-            }            
-        } else {
-        System.out.println("No se ha encontrado el archivo de audio");
-        }
-        
-        //Crear los marcadores con Layout
-        //Layout principal
-        HBox panePuntuacion = new HBox();
-        panePuntuacion.setTranslateY(20);
-        panePuntuacion.setMinWidth(ANCHO_PANTALLA);
-        panePuntuacion.setAlignment(Pos.CENTER);
-        panePuntuacion.setSpacing(100);
-        
-        //Layout para puntuación actual
-        HBox panePuntuacionActual = new HBox();
-        panePuntuacionActual.setSpacing(10);
-        panePuntuacion.getChildren().add(panePuntuacionActual);
-        
-        //Layout para puntuación máxima
-        HBox panePuntuacionMax = new HBox();
-        panePuntuacionMax.setSpacing(10);
-        panePuntuacion.getChildren().add(panePuntuacionMax);
-        
-        //Layout para vidas
-        HBox paneVidas = new HBox();
-        paneVidas.setSpacing(10);
-        panePuntuacion.getChildren().add(paneVidas);
-        
-        //Texo de etiqueta para la puntuación
-        Text textoPuntos = new Text ("Puntos:");
-        textoPuntos.setFont(Font.font(TAMAÑO_LETRAS));
-        textoPuntos.setFill(Color.GREEN);
-        
-        //Texo para la puntuación
-        textoPuntuacion = new Text ("0");
-        textoPuntuacion.setFont(Font.font(TAMAÑO_LETRAS));
-        textoPuntuacion.setFill(Color.WHITE);
-        
-        //Texto de etiqueta para la puntuación máxima
-        Text textoPuntosMax = new Text("Max.Puntuación:");
-        textoPuntosMax.setFont(Font.font(TAMAÑO_LETRAS));
-        textoPuntosMax.setFill(Color.BLUE);
-        
-        //Texto para la puntuación máxima
-        Text textoPuntuacionMax = new Text("0");
-        textoPuntuacionMax.setFont(Font.font(TAMAÑO_LETRAS));
-        textoPuntuacionMax.setFill(Color.WHITE);
-        
-        //Texto de etiqueta para Vida
-        Text textoVidas = new Text("Vidas:");
-        textoVidas.setFont(Font.font(TAMAÑO_LETRAS));
-        textoVidas.setFill(Color.RED);
-        
-        //Texto para Vida
-        textoNumeroVidas = new Text("3");
-        textoNumeroVidas.setFont(Font.font(TAMAÑO_LETRAS));
-        textoNumeroVidas.setFill(Color.WHITE);
-        
-        //Añadir los textos a los Layout reservados para ello
-        panePuntuacionActual.getChildren().add(textoPuntos);
-        panePuntuacionActual.getChildren().add(textoPuntuacion);
-        panePuntuacionMax.getChildren().add(textoPuntosMax);
-        panePuntuacionMax.getChildren().add(textoPuntuacionMax);
-        paneVidas.getChildren().add(textoVidas);
-        paneVidas.getChildren().add(textoNumeroVidas);
         
         //Imagen Game Over 
         var imagenGameOver = new Image(getClass().getResourceAsStream("/images/GameOver.png"));
@@ -454,6 +252,8 @@ public class Alien extends Application {
         //Animación
         movimiento = new Timeline(
             new KeyFrame(Duration.seconds(0.017),(var ae) -> {
+                //mostrar variables
+                //System.out.println("Velocidad Titán: " + velocidadNaveTitan);
                 //Movimiento del fondo comprobando que ha llegado al final de la pantalla
                 fondoPantallaView1.setLayoutY(posicionYFondo1);
                 posicionYFondo1+= velocidadFondo;
@@ -730,7 +530,8 @@ public class Alien extends Application {
                     posicionXDisparoLazer = posicionNaveX - 171;
                     posicionYDisparoLazer = posicionNaveY - 108;
                 }
-                
+                System.out.println("pulsar espacio = " + estadoEspacio);
+                System.out.println("disparando = " + estadoDisparo);
                 if ((posicionYDisparoLazer < -180) || (retornoLazer == true)){
                     posicionXDisparoLazer = posicionNaveX - 171;
                     posicionYDisparoLazer = posicionNaveY - 108;
@@ -898,6 +699,7 @@ public class Alien extends Application {
                     //Dejar de pulsar tecla espacio
                     //dispararLazer = false; 
                     ultimoEstadoEspacio = 0;
+                    estadoEspacio = 0;
                     break;
             }
         });
@@ -1102,6 +904,280 @@ public class Alien extends Application {
         
         //Rotar nave Blue
         grupoNaveBlue.setRotate(180);
+    }
+    
+    //Método para crear nave Green
+    private void crearNaveGreen(){
+        //Imagen nave Green
+        var naveGreen = new Image(getClass().getResourceAsStream("/images/NaveGreen.png"));
+        ImageView naveGreenView = new ImageView(naveGreen);
+        
+        //Zona de contacto nave Green
+        zonaContactoGreen = new Polyline();
+        zonaContactoGreen.getPoints().addAll(new Double[]{
+            0.0, 0.0,
+            -65.0, 100.0,
+            -55.0, 170.0 ,
+            -183.0, 280.0,
+            -183.0, 305.0,
+            0.0, 230.0,
+            183.0, 305.0,
+            183.0, 280.0,
+            55.0, 170.0,
+            65.0, 100.0
+        });
+        zonaContactoGreen.setFill(Color.YELLOW);
+        zonaContactoGreen.setVisible(false);
+        zonaContactoGreen.setLayoutX(183);
+        zonaContactoGreen.setLayoutY(0);
+        
+        //Agrupar imagen y objetos de la nave Blue
+        grupoNaveGreen = new Group();
+        grupoNaveGreen.getChildren().add(zonaContactoGreen);
+        grupoNaveGreen.getChildren().add(naveGreenView);
+        
+        //Escalar nave Blue
+        grupoNaveGreen.setScaleX(0.25);
+        grupoNaveGreen.setScaleY(0.25);
+        
+        //Rotar nave Blue
+        grupoNaveGreen.setRotate(180);
+    }
+     
+    //Método para crear Asteroide1
+    private void crearAsteroide1(){
+        //Imagen nave Asteroide1
+        var asteroide1 = new Image(getClass().getResourceAsStream("/images/Asteroide_1.png"));
+        ImageView Asteroide1View = new ImageView(asteroide1);
+        
+        //Zona de contacto Asteroide1
+        zonaContactoAsteroide1 = new Polyline();
+        zonaContactoAsteroide1.getPoints().addAll(new Double[]{
+            0.0, 0.0,
+            -150.0, 20.0,
+            -300.0, 250.0 ,
+            -180.0, 380.0,
+            0.0, 455.0,
+            235.0, 260.0,
+            140.0, 75.0,
+            0.0, 0.0,
+        });
+        zonaContactoAsteroide1.setFill(Color.YELLOW);
+        zonaContactoAsteroide1.setVisible(false);
+        zonaContactoAsteroide1.setLayoutX(300);
+        zonaContactoAsteroide1.setLayoutY(0);
+        
+        //Agrupar imagen y objetos de Asteroide1
+        grupoAsteroide1 = new Group();
+        grupoAsteroide1.getChildren().add(zonaContactoAsteroide1);
+        grupoAsteroide1.getChildren().add(Asteroide1View);
+        
+        //Escalar Asteroide 1
+        grupoAsteroide1.setScaleX(0.15);
+        grupoAsteroide1.setScaleY(0.15);
+    }
+    
+    //Método para crear Asteroide2
+    private void crearAsteroide2(){
+        //Imagen nave Asteroide2
+        var asteroide2 = new Image(getClass().getResourceAsStream("/images/Asteroide_2.png"));
+        ImageView Asteroide2View = new ImageView(asteroide2);
+        
+        //Zona de contacto Asteroide2
+        zonaContactoAsteroide2 = new Polyline();
+        zonaContactoAsteroide2.getPoints().addAll(new Double[]{
+            0.0, 0.0,
+            -150.0, 53.0,
+            -240.0, 270.0 ,
+            -160.0,440.0,
+            -5.0, 475.0,
+            120.0, 460.0,
+            260.0, 290.0,
+            190.0, 120.0,
+            110.0, 95.0,
+            60.0, 5.0,
+            0.0, 0.0,
+        });
+        zonaContactoAsteroide2.setFill(Color.YELLOW);
+        zonaContactoAsteroide2.setVisible(false);
+        zonaContactoAsteroide2.setLayoutX(240);
+        zonaContactoAsteroide2.setLayoutY(0);
+        
+        //Agrupar imagen y objetos de Asteroide2
+        grupoAsteroide2 = new Group();
+        grupoAsteroide2.getChildren().add(zonaContactoAsteroide2);
+        grupoAsteroide2.getChildren().add(Asteroide2View);
+        
+        //Escalar Asteroide 2
+        grupoAsteroide2.setScaleX(0.15);
+        grupoAsteroide2.setScaleY(0.15);
+    }
+    
+    //Método para crear imagen Explosión Game Over
+    private void crearImagenGameOver(){
+    //Imagen explosion game over
+        var imagenExplosionGameOver = new Image(getClass().getResourceAsStream("/images/explosionGameOver.png"));
+        imagenExplosionGameOverView = new ImageView(imagenExplosionGameOver);
+    }
+    
+    //Método para crear lazer
+    private void crearLazer(){
+        //Imagen disparo lazer
+        var disparoLazer = new Image(getClass().getResourceAsStream("/images/DisparoLaser.png"));
+        ImageView disparoLazerView = new ImageView(disparoLazer);
+        
+        //Zona decontacto disparo lazer
+        ZonaContactoDisparoLazer = new Circle();
+        ZonaContactoDisparoLazer.setCenterX(86);
+        ZonaContactoDisparoLazer.setCenterY(115);
+        ZonaContactoDisparoLazer.setRadius(20);
+        ZonaContactoDisparoLazer.setFill(Color.YELLOW);
+        ZonaContactoDisparoLazer.setVisible(false);  
+                
+        //Agrupar imagen y objetos de disparo lazer
+        grupoDisparoLazer = new Group();
+        grupoDisparoLazer.getChildren().add(disparoLazerView);
+        grupoDisparoLazer.getChildren().add(ZonaContactoDisparoLazer);
+        
+        //Escalar disparo lazer
+        grupoDisparoLazer.setScaleX(0.25);
+        grupoDisparoLazer.setScaleY(0.25); 
+        
+        //Sonido disparo lazer //   
+        URL urlAudio = getClass().getResource("/sonidos/SHOOT013.mp3");
+        if(urlAudio != null) {
+            try {
+                sonidoLazer = new AudioClip(urlAudio.toURI().toString());
+            } catch (URISyntaxException ex) {
+                System.out.println("Error en el formato de ruta de archivo de audio");
+            }            
+        } else {
+        System.out.println("No se ha encontrado el archivo de audio");
+        }
+    }
+    
+    //Método para sonido ecplosion Naves
+    private void explosionNaves(){
+        //Sonido de explosión naves enemigas //   
+        URL urlExplosionNaves = getClass().getResource("/sonidos/explosion_Naves.mp3");
+        if(urlExplosionNaves != null) {
+            try {
+                sonidoExplosionNaves = new AudioClip(urlExplosionNaves.toURI().toString());
+            } catch (URISyntaxException ex) {
+                System.out.println("Error en el formato de ruta de archivo de audio");
+            }            
+        } else {
+        System.out.println("No se ha encontrado el archivo de audio");
+        }
+    }
+    
+    //Método para sonido explosión Asteroides
+    private void explosionAsteroides(){
+        //Sonido de explosión asteroides //   
+        URL urlExplosionAsteroides = getClass().getResource("/sonidos/explosion_asteroides.mp3");
+        if(urlExplosionAsteroides != null) {
+            try {
+                sonidoExplosionAsteroides = new AudioClip(urlExplosionAsteroides.toURI().toString());
+            } catch (URISyntaxException ex) {
+                System.out.println("Error en el formato de ruta de archivo de audio");
+            }            
+        } else {
+        System.out.println("No se ha encontrado el archivo de audio");
+        }
+    }
+    
+    //Método para sonido explosión Game Over
+    private void explosionGameOver(){
+        //Sonido de explosión game over //   
+        URL urlExplosionGameOver = getClass().getResource("/sonidos/explosion1GameOver.mp3");
+        if(urlExplosionGameOver != null) {
+            try {
+                sonidoExplosionGameOver = new AudioClip(urlExplosionGameOver.toURI().toString());
+            } catch (URISyntaxException ex) {
+                System.out.println("Error en el formato de ruta de archivo de audio");
+            }            
+        } else {
+        System.out.println("No se ha encontrado el archivo de audio");
+        }
+    }
+    
+    //Método ara sonido explosion Choque nave
+    private void explosionChoqueNave(){
+        //Sonido de choque de la nave   
+        URL urlChoqueNave = getClass().getResource("/sonidos/ChoqueNave.mp3");
+        if(urlChoqueNave != null) {
+            try {
+                sonidoChoqueNave = new AudioClip(urlChoqueNave.toURI().toString());
+            } catch (URISyntaxException ex) {
+                System.out.println("Error en el formato de ruta de archivo de audio");
+            }            
+        } else {
+        System.out.println("No se ha encontrado el archivo de audio");
+        }
+    }
+    
+    //Método para crear marcadores
+    private void marcadores(){
+        //Crear los marcadores con Layout
+        //Layout principal
+        panePuntuacion = new HBox();
+        panePuntuacion.setTranslateY(20);
+        panePuntuacion.setMinWidth(ANCHO_PANTALLA);
+        panePuntuacion.setAlignment(Pos.CENTER);
+        panePuntuacion.setSpacing(100);
+        
+        //Layout para puntuación actual
+        HBox panePuntuacionActual = new HBox();
+        panePuntuacionActual.setSpacing(10);
+        panePuntuacion.getChildren().add(panePuntuacionActual);
+        
+        //Layout para puntuación máxima
+        HBox panePuntuacionMax = new HBox();
+        panePuntuacionMax.setSpacing(10);
+        panePuntuacion.getChildren().add(panePuntuacionMax);
+        
+        //Layout para vidas
+        HBox paneVidas = new HBox();
+        paneVidas.setSpacing(10);
+        panePuntuacion.getChildren().add(paneVidas);
+        
+        //Texo de etiqueta para la puntuación
+        Text textoPuntos = new Text ("Puntos:");
+        textoPuntos.setFont(Font.font(TAMAÑO_LETRAS));
+        textoPuntos.setFill(Color.GREEN);
+        
+        //Texo para la puntuación
+        textoPuntuacion = new Text ("0");
+        textoPuntuacion.setFont(Font.font(TAMAÑO_LETRAS));
+        textoPuntuacion.setFill(Color.WHITE);
+        
+        //Texto de etiqueta para la puntuación máxima
+        Text textoPuntosMax = new Text("Max.Puntuación:");
+        textoPuntosMax.setFont(Font.font(TAMAÑO_LETRAS));
+        textoPuntosMax.setFill(Color.BLUE);
+        
+        //Texto para la puntuación máxima
+        textoPuntuacionMax = new Text("0");
+        textoPuntuacionMax.setFont(Font.font(TAMAÑO_LETRAS));
+        textoPuntuacionMax.setFill(Color.WHITE);
+        
+        //Texto de etiqueta para Vida
+        Text textoVidas = new Text("Vidas:");
+        textoVidas.setFont(Font.font(TAMAÑO_LETRAS));
+        textoVidas.setFill(Color.RED);
+        
+        //Texto para Vida
+        textoNumeroVidas = new Text("3");
+        textoNumeroVidas.setFont(Font.font(TAMAÑO_LETRAS));
+        textoNumeroVidas.setFill(Color.WHITE);
+        
+        //Añadir los textos a los Layout reservados para ello
+        panePuntuacionActual.getChildren().add(textoPuntos);
+        panePuntuacionActual.getChildren().add(textoPuntuacion);
+        panePuntuacionMax.getChildren().add(textoPuntosMax);
+        panePuntuacionMax.getChildren().add(textoPuntuacionMax);
+        paneVidas.getChildren().add(textoVidas);
+        paneVidas.getChildren().add(textoNumeroVidas);
     }
     //Método para reiniciar el juego
     private void resetGame() {
